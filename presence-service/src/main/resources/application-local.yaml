@@ -1,0 +1,18 @@
+server:
+  port: ${SERVER_PORT:8085}
+
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/presence_service}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+  flyway:
+    enabled: ${FLYWAY_ENABLED:true}
+    url: ${FLYWAY_URL:${DB_URL:jdbc:postgresql://localhost:5432/presence_service}}
+    user: ${FLYWAY_USERNAME:${DB_USERNAME:postgres}}
+    password: ${FLYWAY_PASSWORD:${DB_PASSWORD:postgres}}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
