@@ -1,13 +1,13 @@
 server:
-  port: ${SERVER_PORT:8082}
+  port: ${GROUP_SERVICE_PORT:8082}
 
 spring:
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/group_service}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:postgres}
+    url: ${GROUP_DB_URL:jdbc:postgresql://localhost:5432/group_service}
+    username: ${GROUP_DB_USERNAME:postgres}
+    password: ${GROUP_DB_PASSWORD:postgres}
   flyway:
-    enabled: ${FLYWAY_ENABLED:true}
-    url: ${FLYWAY_URL:${DB_URL:jdbc:postgresql://localhost:5432/group_service}}
-    user: ${FLYWAY_USERNAME:${DB_USERNAME:postgres}}
-    password: ${FLYWAY_PASSWORD:${DB_PASSWORD:postgres}}
+    enabled: ${GROUP_FLYWAY_ENABLED:true}
+    url: ${GROUP_FLYWAY_URL:${GROUP_DB_URL:jdbc:postgresql://localhost:5432/group_service}}
+    user: ${GROUP_FLYWAY_USERNAME:${GROUP_DB_USERNAME:postgres}}
+    password: ${GROUP_FLYWAY_PASSWORD:${GROUP_DB_PASSWORD:postgres}}

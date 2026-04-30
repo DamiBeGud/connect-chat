@@ -1,24 +1,24 @@
 server:
-  port: ${SERVER_PORT:8083}
+  port: ${CHAT_SERVICE_PORT:8083}
 
 spring:
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/chat_service}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:postgres}
+    url: ${CHAT_DB_URL:jdbc:postgresql://localhost:5432/chat_service}
+    username: ${CHAT_DB_USERNAME:postgres}
+    password: ${CHAT_DB_PASSWORD:postgres}
   flyway:
-    enabled: ${FLYWAY_ENABLED:true}
-    url: ${FLYWAY_URL:${DB_URL:jdbc:postgresql://localhost:5432/chat_service}}
-    user: ${FLYWAY_USERNAME:${DB_USERNAME:postgres}}
-    password: ${FLYWAY_PASSWORD:${DB_PASSWORD:postgres}}
+    enabled: ${CHAT_FLYWAY_ENABLED:true}
+    url: ${CHAT_FLYWAY_URL:${CHAT_DB_URL:jdbc:postgresql://localhost:5432/chat_service}}
+    user: ${CHAT_FLYWAY_USERNAME:${CHAT_DB_USERNAME:postgres}}
+    password: ${CHAT_FLYWAY_PASSWORD:${CHAT_DB_PASSWORD:postgres}}
   rabbitmq:
-    host: ${RABBITMQ_HOST:localhost}
-    port: ${RABBITMQ_PORT:5672}
-    username: ${RABBITMQ_USERNAME:guest}
-    password: ${RABBITMQ_PASSWORD:guest}
+    host: ${CHAT_RABBITMQ_HOST:localhost}
+    port: ${CHAT_RABBITMQ_PORT:5672}
+    username: ${CHAT_RABBITMQ_USERNAME:guest}
+    password: ${CHAT_RABBITMQ_PASSWORD:guest}
   cassandra:
-    contact-points: ${CASSANDRA_CONTACT_POINTS:localhost}
-    port: ${CASSANDRA_PORT:9042}
-    keyspace-name: ${CASSANDRA_KEYSPACE:connect_chat}
-    local-datacenter: ${CASSANDRA_DATACENTER:datacenter1}
-    schema-action: ${CASSANDRA_SCHEMA_ACTION:NONE}
+    contact-points: ${CHAT_CASSANDRA_CONTACT_POINTS:localhost}
+    port: ${CHAT_CASSANDRA_PORT:9042}
+    keyspace-name: ${CHAT_CASSANDRA_KEYSPACE:connect_chat}
+    local-datacenter: ${CHAT_CASSANDRA_DATACENTER:datacenter1}
+    schema-action: ${CHAT_CASSANDRA_SCHEMA_ACTION:NONE}
