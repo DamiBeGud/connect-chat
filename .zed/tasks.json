@@ -1,0 +1,44 @@
+[
+  {
+    "label": "start: identity-service",
+    "command": "set -a && . ./.env && set +a && cd identity-service && ./gradlew bootRun",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false
+  },
+  {
+    "label": "start: group-service",
+    "command": "set -a && . ./.env && set +a && cd group-service && ./gradlew bootRun",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false
+  },
+  {
+    "label": "start: chat-service",
+    "command": "set -a && . ./.env && set +a && cd chat-service && ./gradlew bootRun",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false
+  },
+  {
+    "label": "start: message-storage-service",
+    "command": "set -a && . ./.env && set +a && cd message-storage-service && ./gradlew bootRun",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false
+  },
+  {
+    "label": "start: presence-service",
+    "command": "set -a && . ./.env && set +a && cd presence-service && ./gradlew bootRun",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false
+  },
+  {
+    "label": "start: all services",
+    "command": "set -a && . ./.env && set +a && (cd identity-service && ./gradlew bootRun) & (cd group-service && ./gradlew bootRun) & (cd chat-service && ./gradlew bootRun) & (cd message-storage-service && ./gradlew bootRun) & (cd presence-service && ./gradlew bootRun) & wait",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false
+  }
+]
