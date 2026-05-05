@@ -50,3 +50,9 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+tasks.register('recompileOnChange') {
+	group = 'development'
+	description = 'Continuously recompiles this service for Spring Boot DevTools hot reload.'
+	dependsOn tasks.named('classes')
+}

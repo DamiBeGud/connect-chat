@@ -78,6 +78,20 @@ cd identity-service
 ./gradlew bootRun
 ```
 
+For hot reload during local development, keep the service running in one terminal and run continuous compilation in another terminal:
+
+```bash
+cd identity-service
+./gradlew bootRun
+```
+
+```bash
+cd identity-service
+./gradlew --continuous recompileOnChange
+```
+
+Spring Boot DevTools will restart the running service whenever Gradle recompiles changed code.
+
 Default local ports:
 
 - `identity-service`: `8081`

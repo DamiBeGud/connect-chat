@@ -8,26 +8,15 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
 public record RegisterRequest(
-    @NotNull
-    @Positive
-    Long phoneNumber,
+    @NotNull @Positive String phoneNumber,
 
-    @NotBlank
-    @Size(max = 100)
-    String firstName,
+    @NotBlank @Size(max = 100) String firstName,
 
-    @NotBlank
-    @Size(max = 100)
-    String lastName,
+    @NotBlank @Size(max = 100) String lastName,
 
-    @Size(max = 100)
-    String nickname,
+    @Size(max = 100) String nickname,
 
-    @NotNull
-    @Past
-    LocalDate dateOfBirth,
+    @NotNull @Past LocalDate dateOfBirth,
 
-    @NotBlank
-    @Size(max = 100)
-    String country
+    @NotBlank @Size(max = 100) String country
 ) {}
