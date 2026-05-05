@@ -13,3 +13,9 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: ${IDENTITY_JWT_ISSUER_URI:http://keycloak:8080/realms/connect-chat}
+
+identity:
+  twilio:
+    account-sid: ${IDENTITY_TWILIO_ACCOUNT_SID:}
+    auth-token: ${IDENTITY_TWILIO_AUTH_TOKEN:}
+    from-phone-number: ${IDENTITY_TWILIO_FROM_PHONE_NUMBER:}
