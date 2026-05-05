@@ -1,4 +1,4 @@
-package com.connectchat.identity.exception;
+package com.connectchat.identity.common.error;
 
 public class BadRequestException extends RuntimeException {
 

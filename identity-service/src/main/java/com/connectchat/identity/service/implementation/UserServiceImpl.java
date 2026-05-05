@@ -1,20 +1,21 @@
-package com.connectchat.identity.service.implementaion;
+package com.connectchat.identity.service.implementation;
 
-import com.connectchat.identity.dto.UserDto;
+import com.connectchat.identity.api.response.UserDto;
+import com.connectchat.identity.common.error.BadRequestException;
 import com.connectchat.identity.entity.User;
-import com.connectchat.identity.exception.BadRequestException;
 import com.connectchat.identity.repository.UserRepository;
 import com.connectchat.identity.service.UserService;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Random;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
+@Service
 public class UserServiceImpl implements UserService {
+    private static final Random RANDOM = new Random();
 
-    private final Random random;
     private final UserRepository userRepository;
 
     @Override
@@ -40,6 +41,6 @@ public class UserServiceImpl implements UserService {
     }
 
     private String generateValidationCode() {
-        return String.format("%06d", random.nextInt(1_000_000));
+        return String.format("%06d", RANDOM.nextInt(1_000_000));
     }
 }

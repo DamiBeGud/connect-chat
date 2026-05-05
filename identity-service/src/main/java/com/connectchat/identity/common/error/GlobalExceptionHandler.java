@@ -1,8 +1,8 @@
-package com.connectchat.identity.exception;
+package com.connectchat.identity.common.error;
 
-import com.connectchat.identity.util.ErrorInfo;
-import com.connectchat.identity.util.Metadata;
-import com.connectchat.identity.util.Response;
+import com.connectchat.identity.common.web.ErrorInfo;
+import com.connectchat.identity.common.web.Metadata;
+import com.connectchat.identity.common.web.Response;
 import java.time.Instant;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

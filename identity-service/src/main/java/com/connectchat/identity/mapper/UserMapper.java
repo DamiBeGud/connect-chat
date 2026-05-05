@@ -1,7 +1,7 @@
-package com.connectchat.identity.util.mapper;
+package com.connectchat.identity.mapper;
 
-import com.connectchat.identity.dto.RegisterRequest;
-import com.connectchat.identity.dto.UserDto;
+import com.connectchat.identity.api.request.RegisterRequest;
+import com.connectchat.identity.api.response.UserDto;
 import org.springframework.stereotype.Component;
 
 @Component

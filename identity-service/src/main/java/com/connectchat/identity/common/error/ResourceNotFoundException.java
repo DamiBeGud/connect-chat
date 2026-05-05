@@ -1,4 +1,4 @@
-package com.connectchat.identity.exception;
+package com.connectchat.identity.common.error;
 
 public class ResourceNotFoundException extends RuntimeException {
 

@@ -1,4 +1,4 @@
-package com.connectchat.identity.dto;
+package com.connectchat.identity.api.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
