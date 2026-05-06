@@ -13,6 +13,7 @@ import com.connectchat.identity.service.SmsClient;
 import com.connectchat.identity.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +47,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public AuthTokenResponse refreshToken(RefreshTokenRequest request) {
         RefreshToken storedToken = refreshTokenService.validateRefreshToken(
             request.refreshToken()

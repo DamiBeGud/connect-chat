@@ -8,12 +8,6 @@ spring:
     url: ${IDENTITY_FLYWAY_URL:${IDENTITY_DB_URL:jdbc:postgresql://postgres:5432/identity_service}}
     user: ${IDENTITY_FLYWAY_USERNAME:${IDENTITY_DB_USERNAME:postgres}}
     password: ${IDENTITY_FLYWAY_PASSWORD:${IDENTITY_DB_PASSWORD:postgres}}
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: ${IDENTITY_JWT_ISSUER_URI:http://keycloak:8080/realms/connect-chat}
-
 identity:
   jwt:
     secret: ${IDENTITY_JWT_SECRET}

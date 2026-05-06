@@ -10,6 +10,7 @@ import com.connectchat.identity.service.UserService;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +36,11 @@ public class UserServiceImpl implements UserService {
             .country(request.country())
             .build();
 
-        return userRepository.save(newUser);
+        try {
+            return userRepository.saveAndFlush(newUser);
+        } catch (DataIntegrityViolationException exception) {
+            throw new BadRequestException("Phone number is already registered");
+        }
     }
 
     @Override

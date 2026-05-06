@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:identity_service;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;INIT=CREATE DOMAIN IF NOT EXISTS TIMESTAMPTZ AS TIMESTAMP WITH TIME ZONE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  flyway:
+    enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+identity:
+  jwt:
+    secret: test-connect-chat-jwt-secret-must-be-at-least-32-bytes
+    access-token-expiration-ms: 900000
+    refresh-token-expiration-ms: 2592000000
+    service-token-expiration-ms: 900000
+    issuer: http://localhost:8081
+  twilio:
+    account-sid:
+    auth-token:
+    from-phone-number:

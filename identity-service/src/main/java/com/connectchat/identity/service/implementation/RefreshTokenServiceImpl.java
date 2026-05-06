@@ -58,7 +58,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     public RefreshToken validateRefreshToken(String rawToken) {
         Instant now = Instant.now();
         RefreshToken storedToken = refreshTokenRepository
-            .findByTokenHash(hashToken(rawToken))
+            .findByTokenHashForUpdate(hashToken(rawToken))
             .orElseThrow(() -> new BadRequestException("Invalid refresh token"));
 
         if (storedToken.isRevoked()) {
