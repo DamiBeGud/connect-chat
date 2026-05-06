@@ -80,6 +80,13 @@ public class User {
         isValidationCodeSent = true;
     }
 
+    public void markVerified() {
+        isVerified = true;
+        verifiedAt = Instant.now();
+        verificationCode = null;
+        verificationCodeExpiresAt = null;
+    }
+
     @PrePersist
     void addTimestampsBeforeCreate() {
         Instant now = Instant.now();

@@ -18,7 +18,10 @@ public class SecurityConfig {
                 auth
                     .requestMatchers("/actuator/health", "/actuator/health/**")
                     .permitAll()
-                    .requestMatchers("/api/v1/identity/auth/register")
+                    .requestMatchers(
+                        "/api/v1/identity/auth/register",
+                        "/api/v1/identity/auth/register/verify"
+                    )
                     .permitAll()
                     .anyRequest()
                     .authenticated()

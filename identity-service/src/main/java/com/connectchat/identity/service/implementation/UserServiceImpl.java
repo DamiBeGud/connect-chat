@@ -1,10 +1,12 @@
 package com.connectchat.identity.service.implementation;
 
 import com.connectchat.identity.api.request.RegisterRequest;
+import com.connectchat.identity.api.request.RegisterVerificationRequest;
 import com.connectchat.identity.common.error.BadRequestException;
 import com.connectchat.identity.entity.User;
 import com.connectchat.identity.repository.UserRepository;
 import com.connectchat.identity.service.UserService;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,5 +41,35 @@ public class UserServiceImpl implements UserService {
     public void markValidationCodeSent(User user) {
         user.markValidationCodeSent();
         userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public User verifyRegistration(RegisterVerificationRequest request) {
+        User user = userRepository
+            .findByPhoneNumber(request.phoneNumber())
+            .orElseThrow(() -> new BadRequestException("Invalid verification code"));
+
+        if (user.isVerified()) {
+            throw new BadRequestException("User is already verified");
+        }
+
+        if (!user.isValidationCodeSent()) {
+            throw new BadRequestException("Verification code was not sent");
+        }
+
+        if (
+            user.getVerificationCodeExpiresAt() == null ||
+            user.getVerificationCodeExpiresAt().isBefore(Instant.now())
+        ) {
+            throw new BadRequestException("Verification code expired");
+        }
+
+        if (!request.verificationCode().equals(user.getVerificationCode())) {
+            throw new BadRequestException("Invalid verification code");
+        }
+
+        user.markVerified();
+        return userRepository.save(user);
     }
 }

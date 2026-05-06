@@ -21,6 +21,7 @@ identity:
   jwt:
     secret: ${IDENTITY_JWT_SECRET:connect-chat-local-jwt-secret-must-be-at-least-32-bytes}
     access-token-expiration-ms: ${IDENTITY_JWT_ACCESS_TOKEN_EXPIRATION_MS:900000}
+    refresh-token-expiration-ms: ${IDENTITY_JWT_REFRESH_TOKEN_EXPIRATION_MS:2592000000}
     service-token-expiration-ms: ${IDENTITY_JWT_SERVICE_TOKEN_EXPIRATION_MS:900000}
     issuer: ${IDENTITY_JWT_ISSUER:http://localhost:8081}
   twilio:
