@@ -20,7 +20,8 @@ public class SecurityConfig {
                     .permitAll()
                     .requestMatchers(
                         "/api/v1/identity/auth/register",
-                        "/api/v1/identity/auth/register/verify"
+                        "/api/v1/identity/auth/register/verify",
+                        "/api/v1/identity/auth/token/refresh"
                     )
                     .permitAll()
                     .anyRequest()

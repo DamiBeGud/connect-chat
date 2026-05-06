@@ -1,5 +1,6 @@
 package com.connectchat.identity.api;
 
+import com.connectchat.identity.api.request.RefreshTokenRequest;
 import com.connectchat.identity.api.request.RegisterRequest;
 import com.connectchat.identity.api.request.RegisterVerificationRequest;
 import com.connectchat.identity.api.response.AuthTokenResponse;
@@ -54,6 +55,21 @@ public class IdentityController {
             responseFactory.success(
                 HttpStatus.OK,
                 "Registration verified",
+                tokens
+            )
+        );
+    }
+
+    @PostMapping("/auth/token/refresh")
+    public ResponseEntity<Response<AuthTokenResponse>> refreshToken(
+        @Valid @RequestBody RefreshTokenRequest request
+    ) {
+        AuthTokenResponse tokens = authService.refreshToken(request);
+
+        return ResponseEntity.ok(
+            responseFactory.success(
+                HttpStatus.OK,
+                "Token refreshed",
                 tokens
             )
         );

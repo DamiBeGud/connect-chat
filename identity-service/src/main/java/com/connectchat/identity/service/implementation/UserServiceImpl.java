@@ -3,10 +3,12 @@ package com.connectchat.identity.service.implementation;
 import com.connectchat.identity.api.request.RegisterRequest;
 import com.connectchat.identity.api.request.RegisterVerificationRequest;
 import com.connectchat.identity.common.error.BadRequestException;
+import com.connectchat.identity.common.error.ResourceNotFoundException;
 import com.connectchat.identity.entity.User;
 import com.connectchat.identity.repository.UserRepository;
 import com.connectchat.identity.service.UserService;
 import java.time.Instant;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,5 +73,13 @@ public class UserServiceImpl implements UserService {
 
         user.markVerified();
         return userRepository.save(user);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public User getUserById(UUID userId) {
+        return userRepository
+            .findById(userId)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 }

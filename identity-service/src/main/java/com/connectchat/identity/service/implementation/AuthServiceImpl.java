@@ -1,8 +1,10 @@
 package com.connectchat.identity.service.implementation;
 
+import com.connectchat.identity.api.request.RefreshTokenRequest;
 import com.connectchat.identity.api.request.RegisterRequest;
 import com.connectchat.identity.api.request.RegisterVerificationRequest;
 import com.connectchat.identity.api.response.AuthTokenResponse;
+import com.connectchat.identity.entity.RefreshToken;
 import com.connectchat.identity.entity.User;
 import com.connectchat.identity.service.AuthService;
 import com.connectchat.identity.service.JwtService;
@@ -36,6 +38,20 @@ public class AuthServiceImpl implements AuthService {
         RegisterVerificationRequest request
     ) {
         User user = userService.verifyRegistration(request);
+
+        return new AuthTokenResponse(
+            jwtService.generateAccessToken(user),
+            refreshTokenService.createRefreshToken(user)
+        );
+    }
+
+    @Override
+    public AuthTokenResponse refreshToken(RefreshTokenRequest request) {
+        RefreshToken storedToken = refreshTokenService.validateRefreshToken(
+            request.refreshToken()
+        );
+        User user = userService.getUserById(storedToken.getUserId());
+        refreshTokenService.revoke(storedToken);
 
         return new AuthTokenResponse(
             jwtService.generateAccessToken(user),
