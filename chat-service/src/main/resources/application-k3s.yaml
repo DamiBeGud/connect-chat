@@ -19,3 +19,8 @@ spring:
     keyspace-name: ${CHAT_CASSANDRA_KEYSPACE:connect_chat}
     local-datacenter: ${CHAT_CASSANDRA_DATACENTER:datacenter1}
     schema-action: ${CHAT_CASSANDRA_SCHEMA_ACTION:NONE}
+
+identity:
+  jwt:
+    secret: ${IDENTITY_JWT_SECRET}
+    issuer: ${IDENTITY_JWT_ISSUER}
