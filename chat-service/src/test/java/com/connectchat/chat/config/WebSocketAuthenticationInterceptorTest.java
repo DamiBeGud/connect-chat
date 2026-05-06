@@ -29,6 +29,7 @@ class WebSocketAuthenticationInterceptorTest {
         StompHeaderAccessor accessor = StompHeaderAccessor.create(
             StompCommand.CONNECT
         );
+        accessor.setSessionId("session-1");
         accessor.setNativeHeader("Authorization", "Bearer token-value");
         Message<byte[]> message = MessageBuilder.createMessage(
             new byte[0],
@@ -44,6 +45,46 @@ class WebSocketAuthenticationInterceptorTest {
     }
 
     @Test
+    void attachesAuthenticatedUserToSubscribeFrame() {
+        String userId = "7efe0aac-48b1-4f82-b5cc-85a9fa9ff7cf";
+        when(jwtDecoder.decode("token-value")).thenReturn(jwt(userId));
+
+        interceptor.preSend(connectMessage("session-1"), null);
+
+        StompHeaderAccessor accessor = StompHeaderAccessor.create(
+            StompCommand.SUBSCRIBE
+        );
+        accessor.setSessionId("session-1");
+        accessor.setDestination("/user/queue/private-messages");
+        Message<byte[]> message = MessageBuilder.createMessage(
+            new byte[0],
+            accessor.getMessageHeaders()
+        );
+
+        Message<?> result = interceptor.preSend(message, null);
+
+        StompHeaderAccessor resultAccessor = StompHeaderAccessor.wrap(result);
+        assertThat(resultAccessor.getUser()).isNotNull();
+        assertThat(resultAccessor.getUser().getName()).isEqualTo(userId);
+    }
+
+    @Test
+    void rejectsSubscribeFrameForUnauthenticatedSession() {
+        StompHeaderAccessor accessor = StompHeaderAccessor.create(
+            StompCommand.SUBSCRIBE
+        );
+        accessor.setSessionId("session-1");
+        accessor.setDestination("/user/queue/private-messages");
+        Message<byte[]> message = MessageBuilder.createMessage(
+            new byte[0],
+            accessor.getMessageHeaders()
+        );
+
+        assertThatThrownBy(() -> interceptor.preSend(message, null))
+            .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
     void rejectsConnectFrameWithoutBearerToken() {
         StompHeaderAccessor accessor = StompHeaderAccessor.create(
             StompCommand.CONNECT
@@ -55,6 +96,19 @@ class WebSocketAuthenticationInterceptorTest {
 
         assertThatThrownBy(() -> interceptor.preSend(message, null))
             .isInstanceOf(AccessDeniedException.class);
+    }
+
+    private Message<byte[]> connectMessage(String sessionId) {
+        StompHeaderAccessor accessor = StompHeaderAccessor.create(
+            StompCommand.CONNECT
+        );
+        accessor.setSessionId(sessionId);
+        accessor.setNativeHeader("Authorization", "Bearer token-value");
+
+        return MessageBuilder.createMessage(
+            new byte[0],
+            accessor.getMessageHeaders()
+        );
     }
 
     private Jwt jwt(String subject) {
