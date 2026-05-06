@@ -1,0 +1,2 @@
+ALTER TABLE users
+    ADD COLUMN is_validation_code_sent BOOLEAN NOT NULL DEFAULT FALSE;

@@ -3,6 +3,7 @@ package com.connectchat.identity.api;
 import com.connectchat.identity.api.request.RegisterRequest;
 import com.connectchat.identity.common.web.Response;
 import com.connectchat.identity.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/identity")
 @RequiredArgsConstructor
 public class IdentityController {
+
     private final AuthService authService;
 
     @GetMapping("")
@@ -22,9 +24,9 @@ public class IdentityController {
         return ResponseEntity.ok(null);
     }
 
-    @PostMapping("/register")
+    @PostMapping("/auth/register")
     public ResponseEntity<Response<Void>> register(
-        @RequestBody RegisterRequest request
+        @Valid @RequestBody RegisterRequest request
     ) {
         authService.register(request);
         return ResponseEntity.ok(null);

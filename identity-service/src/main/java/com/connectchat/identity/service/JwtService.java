@@ -1,3 +1,12 @@
 package com.connectchat.identity.service;
 
-public interface JwtService {}
+import com.connectchat.identity.entity.User;
+import io.jsonwebtoken.Claims;
+
+public interface JwtService {
+    String generateAccessToken(User user);
+
+    Claims parseAccessToken(String token);
+
+    String generateServiceToken(String clientId);
+}

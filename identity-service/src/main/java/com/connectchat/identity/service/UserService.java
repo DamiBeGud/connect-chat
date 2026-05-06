@@ -1,0 +1,10 @@
+package com.connectchat.identity.service;
+
+import com.connectchat.identity.api.request.RegisterRequest;
+import com.connectchat.identity.entity.User;
+
+public interface UserService {
+    User createUser(RegisterRequest request);
+
+    void markValidationCodeSent(User user);
+}
