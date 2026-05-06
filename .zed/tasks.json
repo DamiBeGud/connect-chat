@@ -15,7 +15,7 @@
   },
   {
     "label": "start: chat-service",
-    "command": "set -a && . ./.env && set +a && cd chat-service && ./gradlew bootRun",
+    "command": "set -a && . ./.env && set +a && (cd chat-service && ./gradlew bootRun) & (cd chat-service && ./gradlew --continuous recompileOnChange) & wait",
     "cwd": "$ZED_WORKTREE_ROOT",
     "use_new_terminal": true,
     "allow_concurrent_runs": false

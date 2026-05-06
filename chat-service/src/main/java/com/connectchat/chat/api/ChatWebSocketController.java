@@ -7,12 +7,14 @@ import jakarta.validation.Valid;
 import java.security.Principal;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class ChatWebSocketController {
 
     private final ChatApplicationService chatApplicationService;
@@ -22,8 +24,17 @@ public class ChatWebSocketController {
         @Valid @Payload PrivateMessageRequest request,
         Principal principal
     ) {
+        UUID senderId = UUID.fromString(principal.getName());
+
+        log.info(
+            "Received private chat message senderId={} recipientId={} contentLength={}",
+            senderId,
+            request.recipientId(),
+            request.content().length()
+        );
+
         return chatApplicationService.handlePrivateMessage(
-            UUID.fromString(principal.getName()),
+            senderId,
             request
         );
     }
