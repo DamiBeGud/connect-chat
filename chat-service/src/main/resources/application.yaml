@@ -2,6 +2,12 @@ spring:
   application:
     name: chat-service
 
+chat:
+  messaging:
+    private-message-queue: ${CHAT_PRIVATE_MESSAGE_QUEUE:chat.private-message.queue}
+    private-message-exchange: ${CHAT_PRIVATE_MESSAGE_EXCHANGE:chat.private-message.exchange}
+    private-message-routing-key: ${CHAT_PRIVATE_MESSAGE_ROUTING_KEY:chat.private-message}
+
 management:
   endpoints:
     web:

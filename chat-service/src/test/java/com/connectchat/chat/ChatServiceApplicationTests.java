@@ -9,8 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
             + "org.springframework.boot.flyway.autoconfigure.FlywayAutoConfiguration,"
             + "org.springframework.boot.cassandra.autoconfigure.CassandraAutoConfiguration,"
             + "org.springframework.boot.data.cassandra.autoconfigure.DataCassandraAutoConfiguration,"
-            + "org.springframework.boot.data.cassandra.autoconfigure.DataCassandraRepositoriesAutoConfiguration,"
-            + "org.springframework.boot.amqp.autoconfigure.RabbitAutoConfiguration",
+            + "org.springframework.boot.data.cassandra.autoconfigure.DataCassandraRepositoriesAutoConfiguration",
         "identity.jwt.secret=connect-chat-local-jwt-secret-must-be-at-least-32-bytes",
         "identity.jwt.issuer=http://localhost:8081",
     }

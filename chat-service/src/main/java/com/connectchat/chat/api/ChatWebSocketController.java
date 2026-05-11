@@ -1,7 +1,6 @@
 package com.connectchat.chat.api;
 
 import com.connectchat.chat.api.request.PrivateMessageRequest;
-import com.connectchat.chat.api.response.PrivateMessageResponse;
 import com.connectchat.chat.service.ChatApplicationService;
 import jakarta.validation.Valid;
 import java.security.Principal;
@@ -20,7 +19,7 @@ public class ChatWebSocketController {
     private final ChatApplicationService chatApplicationService;
 
     @MessageMapping("/chat.private")
-    public PrivateMessageResponse sendPrivateMessage(
+    public void sendPrivateMessage(
         @Valid @Payload PrivateMessageRequest request,
         Principal principal
     ) {
@@ -33,7 +32,7 @@ public class ChatWebSocketController {
             request.content().length()
         );
 
-        return chatApplicationService.handlePrivateMessage(
+        chatApplicationService.handlePrivateMessage(
             senderId,
             request
         );
