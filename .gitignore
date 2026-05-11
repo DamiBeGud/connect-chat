@@ -35,3 +35,7 @@ bin/
 ### Logs ###
 *.log
 .env
+
+### Local Test UIs ###
+.tests/
+.ui-test/
