@@ -28,6 +28,10 @@ identity:
     secret: ${IDENTITY_JWT_SECRET:connect-chat-local-jwt-secret-must-be-at-least-32-bytes}
     issuer: ${IDENTITY_JWT_ISSUER:http://localhost:8081}
 
+chat:
+  messaging:
+    deliver-directly: ${CHAT_DELIVER_DIRECTLY:false}
+
 logging:
   level:
     com.connectchat.chat.config.WebSocketAuthenticationInterceptor: DEBUG

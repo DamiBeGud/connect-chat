@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.user.SimpSession;
 import org.springframework.messaging.simp.user.SimpSubscription;
@@ -26,6 +27,7 @@ public class MessageDeliveryServiceImpl implements MessageDeliveryService {
     private final SimpMessagingTemplate messagingTemplate;
     private final SimpUserRegistry userRegistry;
     private final Clock clock;
+    private final ApplicationContext applicationContext;
 
     @Override
     public void deliver(PrivateMessageCommand command) {
@@ -35,6 +37,15 @@ public class MessageDeliveryServiceImpl implements MessageDeliveryService {
             command.recipientId(),
             command.content(),
             Instant.now(clock)
+        );
+
+        log.info(
+            "MessageDeliveryService deliver senderId={} recipientId={} applicationContextId={} applicationContextIdentity={} userRegistryIdentity={}",
+            command.senderId(),
+            command.recipientId(),
+            applicationContext.getId(),
+            System.identityHashCode(applicationContext),
+            System.identityHashCode(userRegistry)
         );
 
         logUserRegistryState("sender", command.senderId().toString());

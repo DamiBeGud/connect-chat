@@ -10,7 +10,7 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -32,7 +32,14 @@ public class WebSocketAuthenticationInterceptor implements ChannelInterceptor {
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
-        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+        StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(
+            message,
+            StompHeaderAccessor.class
+        );
+
+        if (accessor == null) {
+            return message;
+        }
 
         try {
             log.debug(
@@ -73,6 +80,16 @@ public class WebSocketAuthenticationInterceptor implements ChannelInterceptor {
                 }
 
                 accessor.setUser(user);
+
+                if (StompCommand.SUBSCRIBE.equals(accessor.getCommand())) {
+                    log.info(
+                        "WebSocket subscription sessionId={} userId={} subscriptionId={} destination={}",
+                        accessor.getSessionId(),
+                        user.getName(),
+                        accessor.getSubscriptionId(),
+                        accessor.getDestination()
+                    );
+                }
             }
         } catch (RuntimeException exception) {
             log.warn(
@@ -86,10 +103,7 @@ public class WebSocketAuthenticationInterceptor implements ChannelInterceptor {
             throw exception;
         }
 
-        return MessageBuilder.createMessage(
-            message.getPayload(),
-            accessor.getMessageHeaders()
-        );
+        return message;
     }
 
     private String resolveBearerToken(StompHeaderAccessor accessor) {
