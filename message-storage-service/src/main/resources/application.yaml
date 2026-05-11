@@ -2,6 +2,14 @@ spring:
   application:
     name: message-storage-service
 
+message-storage:
+  messaging:
+    private-message-queue: ${MESSAGE_STORAGE_PRIVATE_MESSAGE_QUEUE:message-storage.private-message.queue}
+    private-message-exchange: ${MESSAGE_STORAGE_PRIVATE_MESSAGE_EXCHANGE:chat.private-message.exchange}
+    private-message-routing-key: ${MESSAGE_STORAGE_PRIVATE_MESSAGE_ROUTING_KEY:chat.private-message}
+    inbox-batch-size: ${MESSAGE_STORAGE_INBOX_BATCH_SIZE:50}
+    inbox-processing-delay: ${MESSAGE_STORAGE_INBOX_PROCESSING_DELAY:1000}
+
 management:
   endpoints:
     web:
