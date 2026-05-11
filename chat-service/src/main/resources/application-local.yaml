@@ -11,11 +11,6 @@ spring:
     url: ${CHAT_FLYWAY_URL:${CHAT_DB_URL:jdbc:postgresql://localhost:5432/chat_service}}
     user: ${CHAT_FLYWAY_USERNAME:${CHAT_DB_USERNAME:postgres}}
     password: ${CHAT_FLYWAY_PASSWORD:${CHAT_DB_PASSWORD:postgres}}
-  rabbitmq:
-    host: ${CHAT_RABBITMQ_HOST:localhost}
-    port: ${CHAT_RABBITMQ_PORT:5672}
-    username: ${CHAT_RABBITMQ_USERNAME:guest}
-    password: ${CHAT_RABBITMQ_PASSWORD:guest}
   cassandra:
     contact-points: ${CHAT_CASSANDRA_CONTACT_POINTS:localhost}
     port: ${CHAT_CASSANDRA_PORT:9042}
@@ -27,10 +22,6 @@ identity:
   jwt:
     secret: ${IDENTITY_JWT_SECRET:connect-chat-local-jwt-secret-must-be-at-least-32-bytes}
     issuer: ${IDENTITY_JWT_ISSUER:http://localhost:8081}
-
-chat:
-  messaging:
-    deliver-directly: ${CHAT_DELIVER_DIRECTLY:false}
 
 logging:
   level:

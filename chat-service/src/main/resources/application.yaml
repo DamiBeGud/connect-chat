@@ -4,9 +4,10 @@ spring:
 
 chat:
   messaging:
-    private-message-queue: ${CHAT_PRIVATE_MESSAGE_QUEUE:chat.private-message.queue}
-    private-message-exchange: ${CHAT_PRIVATE_MESSAGE_EXCHANGE:chat.private-message.exchange}
-    private-message-routing-key: ${CHAT_PRIVATE_MESSAGE_ROUTING_KEY:chat.private-message}
+    outbox-batch-size: ${CHAT_OUTBOX_BATCH_SIZE:50}
+    inbox-batch-size: ${CHAT_INBOX_BATCH_SIZE:50}
+    outbox-processing-delay: ${CHAT_OUTBOX_PROCESSING_DELAY:1000}
+    inbox-processing-delay: ${CHAT_INBOX_PROCESSING_DELAY:1000}
 
 management:
   endpoints:

@@ -8,11 +8,6 @@ spring:
     url: ${CHAT_FLYWAY_URL:${CHAT_DB_URL:jdbc:postgresql://postgres:5432/chat_service}}
     user: ${CHAT_FLYWAY_USERNAME:${CHAT_DB_USERNAME:postgres}}
     password: ${CHAT_FLYWAY_PASSWORD:${CHAT_DB_PASSWORD:postgres}}
-  rabbitmq:
-    host: ${CHAT_RABBITMQ_HOST:rabbitmq}
-    port: ${CHAT_RABBITMQ_PORT:5672}
-    username: ${CHAT_RABBITMQ_USERNAME:guest}
-    password: ${CHAT_RABBITMQ_PASSWORD:guest}
   cassandra:
     contact-points: ${CHAT_CASSANDRA_CONTACT_POINTS:cassandra}
     port: ${CHAT_CASSANDRA_PORT:9042}

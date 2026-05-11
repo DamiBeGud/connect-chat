@@ -12,15 +12,11 @@ import java.time.ZoneOffset;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.user.SimpUserRegistry;
 
 class MessageDeliveryServiceImplTest {
 
     private final SimpMessagingTemplate messagingTemplate = org.mockito.Mockito.mock(
         SimpMessagingTemplate.class
-    );
-    private final SimpUserRegistry userRegistry = org.mockito.Mockito.mock(
-        SimpUserRegistry.class
     );
     private final Clock clock = Clock.fixed(
         Instant.parse("2026-05-06T10:15:30Z"),
@@ -29,7 +25,6 @@ class MessageDeliveryServiceImplTest {
     private final MessageDeliveryServiceImpl service =
         new MessageDeliveryServiceImpl(
             messagingTemplate,
-            userRegistry,
             clock
         );
 

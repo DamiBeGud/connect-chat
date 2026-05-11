@@ -3,19 +3,20 @@ package com.connectchat.chat.service.implementation;
 import static org.mockito.Mockito.verify;
 
 import com.connectchat.chat.api.request.PrivateMessageRequest;
-import com.connectchat.chat.common.messaging.PrivateMessagePublisher;
+import com.connectchat.chat.service.OutboxService;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 class ChatApplicationServiceImplTest {
 
-    private final PrivateMessagePublisher privateMessagePublisher =
-        org.mockito.Mockito.mock(PrivateMessagePublisher.class);
+    private final OutboxService outboxService = org.mockito.Mockito.mock(
+        OutboxService.class
+    );
     private final ChatApplicationServiceImpl service =
-        new ChatApplicationServiceImpl(privateMessagePublisher);
+        new ChatApplicationServiceImpl(outboxService);
 
     @Test
-    void delegatesPrivateMessagePublishing() {
+    void enqueuesPrivateMessageInOutbox() {
         UUID senderId = UUID.randomUUID();
         UUID recipientId = UUID.randomUUID();
         PrivateMessageRequest request = new PrivateMessageRequest(
@@ -25,6 +26,6 @@ class ChatApplicationServiceImplTest {
 
         service.handlePrivateMessage(senderId, request);
 
-        verify(privateMessagePublisher).publish(senderId, request);
+        verify(outboxService).enqueuePrivateMessage(senderId, request);
     }
 }

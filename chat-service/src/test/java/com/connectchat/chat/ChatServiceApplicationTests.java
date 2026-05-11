@@ -1,11 +1,16 @@
 package com.connectchat.chat;
 
+import com.connectchat.chat.repository.InboxMessageRepository;
+import com.connectchat.chat.repository.OutboxMessageRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest(
     properties = {
         "spring.autoconfigure.exclude=org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration,"
+            + "org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration,"
+            + "org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration,"
             + "org.springframework.boot.flyway.autoconfigure.FlywayAutoConfiguration,"
             + "org.springframework.boot.cassandra.autoconfigure.CassandraAutoConfiguration,"
             + "org.springframework.boot.data.cassandra.autoconfigure.DataCassandraAutoConfiguration,"
@@ -15,6 +20,12 @@ import org.springframework.boot.test.context.SpringBootTest;
     }
 )
 class ChatServiceApplicationTests {
+
+	@MockitoBean
+	OutboxMessageRepository outboxMessageRepository;
+
+	@MockitoBean
+	InboxMessageRepository inboxMessageRepository;
 
 	@Test
 	void contextLoads() {
