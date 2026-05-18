@@ -1,6 +1,8 @@
 package com.connectchat.chat;
 
 import com.connectchat.chat.repository.InboxMessageRepository;
+import com.connectchat.chat.repository.MessageStatusInboxEventRepository;
+import com.connectchat.chat.repository.MessageStatusOutboxEventRepository;
 import com.connectchat.chat.repository.OutboxMessageRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -27,6 +29,12 @@ class ChatServiceApplicationTests {
 
 	@MockitoBean
 	InboxMessageRepository inboxMessageRepository;
+
+    @MockitoBean
+    MessageStatusOutboxEventRepository messageStatusOutboxEventRepository;
+
+    @MockitoBean
+    MessageStatusInboxEventRepository messageStatusInboxEventRepository;
 
     @MockitoBean
     ConnectionFactory connectionFactory;

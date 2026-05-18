@@ -7,6 +7,11 @@ message-storage:
     private-message-queue: ${MESSAGE_STORAGE_PRIVATE_MESSAGE_QUEUE:message-storage.private-message.queue}
     private-message-exchange: ${MESSAGE_STORAGE_PRIVATE_MESSAGE_EXCHANGE:chat.private-message.exchange}
     private-message-routing-key: ${MESSAGE_STORAGE_PRIVATE_MESSAGE_ROUTING_KEY:chat.private-message}
+    status-request-queue: ${MESSAGE_STORAGE_STATUS_REQUEST_QUEUE:message-storage.message-status.request.queue}
+    status-request-exchange: ${MESSAGE_STORAGE_STATUS_REQUEST_EXCHANGE:chat.message-status.request.exchange}
+    status-request-routing-key: ${MESSAGE_STORAGE_STATUS_REQUEST_ROUTING_KEY:chat.message-status.request}
+    status-confirmed-exchange: ${MESSAGE_STORAGE_STATUS_CONFIRMED_EXCHANGE:chat.message-status.confirmed.exchange}
+    status-confirmed-routing-key: ${MESSAGE_STORAGE_STATUS_CONFIRMED_ROUTING_KEY:chat.message-status.confirmed}
     inbox-batch-size: ${MESSAGE_STORAGE_INBOX_BATCH_SIZE:50}
     inbox-processing-delay: ${MESSAGE_STORAGE_INBOX_PROCESSING_DELAY:1000}
 

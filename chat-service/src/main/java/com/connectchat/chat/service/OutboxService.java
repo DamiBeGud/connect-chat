@@ -8,6 +8,8 @@ import java.util.UUID;
 public interface OutboxService {
     void enqueuePrivateMessage(UUID senderId, PrivateMessageRequest request);
 
+    OutboxMessage requireMessage(UUID messageId);
+
     List<OutboxMessage> claimNextBatch(int batchSize);
 
     void markProcessed(UUID id);

@@ -4,12 +4,18 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.connectchat.chat.common.messaging.PrivateMessageCommand;
+import com.connectchat.chat.common.messaging.RabbitMessageStatusRequestPublisher;
 import com.connectchat.chat.common.messaging.RabbitPrivateMessagePublisher;
 import com.connectchat.chat.common.messaging.config.ChatMessagingProperties;
 import com.connectchat.chat.entity.InboxMessage;
+import com.connectchat.chat.entity.MessageStatusInboxEvent;
+import com.connectchat.chat.entity.MessageStatusOutboxEvent;
 import com.connectchat.chat.entity.OutboxMessage;
 import com.connectchat.chat.service.InboxService;
 import com.connectchat.chat.service.MessageDeliveryService;
+import com.connectchat.chat.service.MessageStatusInboxService;
+import com.connectchat.chat.service.MessageStatusNotificationService;
+import com.connectchat.chat.service.MessageStatusOutboxService;
 import com.connectchat.chat.service.OutboxService;
 import java.time.Instant;
 import java.util.List;
@@ -28,10 +34,24 @@ class ChatMessagePipelineServiceTest {
     );
     private final MessageDeliveryService messageDeliveryService =
         org.mockito.Mockito.mock(MessageDeliveryService.class);
+    private final MessageStatusOutboxService messageStatusOutboxService =
+        org.mockito.Mockito.mock(MessageStatusOutboxService.class);
+    private final RabbitMessageStatusRequestPublisher rabbitMessageStatusRequestPublisher =
+        org.mockito.Mockito.mock(RabbitMessageStatusRequestPublisher.class);
+    private final MessageStatusInboxService messageStatusInboxService =
+        org.mockito.Mockito.mock(MessageStatusInboxService.class);
+    private final MessageStatusNotificationService messageStatusNotificationService =
+        org.mockito.Mockito.mock(MessageStatusNotificationService.class);
     private final ChatMessagingProperties properties = new ChatMessagingProperties(
         "chat.private-message.queue",
         "chat.private-message.exchange",
         "chat.private-message",
+        "chat.message-status.request.queue",
+        "chat.message-status.request.exchange",
+        "chat.message-status.request",
+        "chat.message-status.confirmed.queue",
+        "chat.message-status.confirmed.exchange",
+        "chat.message-status.confirmed",
         5,
         3,
         1000L,
@@ -43,6 +63,10 @@ class ChatMessagePipelineServiceTest {
             rabbitPrivateMessagePublisher,
             inboxService,
             messageDeliveryService,
+            messageStatusOutboxService,
+            rabbitMessageStatusRequestPublisher,
+            messageStatusInboxService,
+            messageStatusNotificationService,
             properties
         );
 
@@ -87,5 +111,44 @@ class ChatMessagePipelineServiceTest {
             )
         );
         verify(inboxService).markProcessed(inboxMessage.getId());
+    }
+
+    @Test
+    void publishesClaimedStatusOutboxEventsToRabbit() {
+        MessageStatusOutboxEvent event = MessageStatusOutboxEvent.builder()
+            .id(UUID.randomUUID())
+            .messageId(UUID.randomUUID())
+            .senderId(UUID.randomUUID())
+            .recipientId(UUID.randomUUID())
+            .statusValue(com.connectchat.chat.common.messaging.PrivateMessageStatus.DELIVERED)
+            .actorUserId(UUID.randomUUID())
+            .eventOccurredAt(Instant.now())
+            .build();
+        when(messageStatusOutboxService.claimNextBatch(5)).thenReturn(List.of(event));
+
+        service.processStatusOutboxEvents();
+
+        verify(rabbitMessageStatusRequestPublisher).publish(event.toEvent());
+        verify(messageStatusOutboxService).markProcessed(event.getId());
+    }
+
+    @Test
+    void notifiesUsersAboutClaimedStatusInboxEvents() {
+        MessageStatusInboxEvent event = MessageStatusInboxEvent.builder()
+            .id(UUID.randomUUID())
+            .sourceEventId(UUID.randomUUID())
+            .messageId(UUID.randomUUID())
+            .senderId(UUID.randomUUID())
+            .recipientId(UUID.randomUUID())
+            .statusValue(com.connectchat.chat.common.messaging.PrivateMessageStatus.SENT)
+            .actorUserId(UUID.randomUUID())
+            .eventOccurredAt(Instant.now())
+            .build();
+        when(messageStatusInboxService.claimNextBatch(3)).thenReturn(List.of(event));
+
+        service.processStatusInboxEvents();
+
+        verify(messageStatusNotificationService).notifyUsers(event);
+        verify(messageStatusInboxService).markProcessed(event.getId());
     }
 }

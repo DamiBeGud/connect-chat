@@ -19,12 +19,32 @@ public class ChatMessagingConfiguration {
 
     @Bean
     Queue privateMessageQueue(ChatMessagingProperties properties) {
-        return new Queue(properties.privateMessageQueue(), true);
+        return queue(properties.privateMessageQueue());
+    }
+
+    @Bean
+    Queue statusRequestQueue(ChatMessagingProperties properties) {
+        return queue(properties.statusRequestQueue());
+    }
+
+    @Bean
+    Queue statusConfirmedQueue(ChatMessagingProperties properties) {
+        return queue(properties.statusConfirmedQueue());
     }
 
     @Bean
     DirectExchange privateMessageExchange(ChatMessagingProperties properties) {
-        return new DirectExchange(properties.privateMessageExchange(), true, false);
+        return exchange(properties.privateMessageExchange());
+    }
+
+    @Bean
+    DirectExchange statusRequestExchange(ChatMessagingProperties properties) {
+        return exchange(properties.statusRequestExchange());
+    }
+
+    @Bean
+    DirectExchange statusConfirmedExchange(ChatMessagingProperties properties) {
+        return exchange(properties.statusConfirmedExchange());
     }
 
     @Bean
@@ -33,10 +53,37 @@ public class ChatMessagingConfiguration {
         DirectExchange privateMessageExchange,
         ChatMessagingProperties properties
     ) {
-        return BindingBuilder
-            .bind(privateMessageQueue)
-            .to(privateMessageExchange)
-            .with(properties.privateMessageRoutingKey());
+        return binding(
+            privateMessageQueue,
+            privateMessageExchange,
+            properties.privateMessageRoutingKey()
+        );
+    }
+
+    @Bean
+    Binding statusRequestBinding(
+        Queue statusRequestQueue,
+        DirectExchange statusRequestExchange,
+        ChatMessagingProperties properties
+    ) {
+        return binding(
+            statusRequestQueue,
+            statusRequestExchange,
+            properties.statusRequestRoutingKey()
+        );
+    }
+
+    @Bean
+    Binding statusConfirmedBinding(
+        Queue statusConfirmedQueue,
+        DirectExchange statusConfirmedExchange,
+        ChatMessagingProperties properties
+    ) {
+        return binding(
+            statusConfirmedQueue,
+            statusConfirmedExchange,
+            properties.statusConfirmedRoutingKey()
+        );
     }
 
     @Bean
@@ -64,5 +111,17 @@ public class ChatMessagingConfiguration {
         factory.setConnectionFactory(connectionFactory);
         factory.setMessageConverter(rabbitMessageConverter);
         return factory;
+    }
+
+    private Queue queue(String name) {
+        return new Queue(name, true);
+    }
+
+    private DirectExchange exchange(String name) {
+        return new DirectExchange(name, true, false);
+    }
+
+    private Binding binding(Queue queue, DirectExchange exchange, String routingKey) {
+        return BindingBuilder.bind(queue).to(exchange).with(routingKey);
     }
 }

@@ -30,6 +30,16 @@ public class OutboxServiceImpl implements OutboxService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public OutboxMessage requireMessage(UUID messageId) {
+        return outboxMessageRepository
+            .findById(messageId)
+            .orElseThrow(() ->
+                new IllegalArgumentException("Message not found: " + messageId)
+            );
+    }
+
+    @Override
     @Transactional
     public List<OutboxMessage> claimNextBatch(int batchSize) {
         List<OutboxMessage> messages = outboxMessageRepository.findBatchForProcessing(

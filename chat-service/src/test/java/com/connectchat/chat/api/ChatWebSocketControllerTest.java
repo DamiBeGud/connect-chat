@@ -3,6 +3,8 @@ package com.connectchat.chat.api;
 import static org.mockito.Mockito.verify;
 
 import com.connectchat.chat.api.request.PrivateMessageRequest;
+import com.connectchat.chat.api.request.PrivateMessageStatusRequest;
+import com.connectchat.chat.common.messaging.PrivateMessageStatus;
 import com.connectchat.chat.service.ChatApplicationService;
 import java.security.Principal;
 import java.util.UUID;
@@ -29,5 +31,39 @@ class ChatWebSocketControllerTest {
         controller.sendPrivateMessage(request, principal);
 
         verify(chatApplicationService).handlePrivateMessage(senderId, request);
+    }
+
+    @Test
+    void acknowledgesDeliveredMessageAsAuthenticatedRecipient() {
+        UUID recipientId = UUID.randomUUID();
+        PrivateMessageStatusRequest request = new PrivateMessageStatusRequest(
+            UUID.randomUUID()
+        );
+        Principal principal = recipientId::toString;
+
+        controller.acknowledgeDelivered(request, principal);
+
+        verify(chatApplicationService).handlePrivateMessageStatus(
+            recipientId,
+            request.messageId(),
+            PrivateMessageStatus.DELIVERED
+        );
+    }
+
+    @Test
+    void acknowledgesReadMessageAsAuthenticatedRecipient() {
+        UUID recipientId = UUID.randomUUID();
+        PrivateMessageStatusRequest request = new PrivateMessageStatusRequest(
+            UUID.randomUUID()
+        );
+        Principal principal = recipientId::toString;
+
+        controller.acknowledgeRead(request, principal);
+
+        verify(chatApplicationService).handlePrivateMessageStatus(
+            recipientId,
+            request.messageId(),
+            PrivateMessageStatus.READ
+        );
     }
 }

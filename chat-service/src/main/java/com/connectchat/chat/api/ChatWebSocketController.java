@@ -1,6 +1,8 @@
 package com.connectchat.chat.api;
 
 import com.connectchat.chat.api.request.PrivateMessageRequest;
+import com.connectchat.chat.api.request.PrivateMessageStatusRequest;
+import com.connectchat.chat.common.messaging.PrivateMessageStatus;
 import com.connectchat.chat.service.ChatApplicationService;
 import jakarta.validation.Valid;
 import java.security.Principal;
@@ -35,6 +37,34 @@ public class ChatWebSocketController {
         chatApplicationService.handlePrivateMessage(
             senderId,
             request
+        );
+    }
+
+    @MessageMapping("/chat.private.delivered")
+    public void acknowledgeDelivered(
+        @Valid @Payload PrivateMessageStatusRequest request,
+        Principal principal
+    ) {
+        acknowledgeStatus(request, principal, PrivateMessageStatus.DELIVERED);
+    }
+
+    @MessageMapping("/chat.private.read")
+    public void acknowledgeRead(
+        @Valid @Payload PrivateMessageStatusRequest request,
+        Principal principal
+    ) {
+        acknowledgeStatus(request, principal, PrivateMessageStatus.READ);
+    }
+
+    private void acknowledgeStatus(
+        PrivateMessageStatusRequest request,
+        Principal principal,
+        PrivateMessageStatus status
+    ) {
+        chatApplicationService.handlePrivateMessageStatus(
+            UUID.fromString(principal.getName()),
+            request.messageId(),
+            status
         );
     }
 }

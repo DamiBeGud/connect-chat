@@ -40,7 +40,7 @@ class MessageStorageServiceImplTest {
         UUID messageId = UUID.randomUUID();
         StoredMessage storedMessage = StoredMessage.builder()
             .messageId(messageId)
-            .status(StoredMessageStatus.RECEIVED.name())
+            .status(StoredMessageStatus.SENT.name())
             .build();
         when(repository.findById(messageId)).thenReturn(Optional.of(storedMessage));
         when(repository.save(storedMessage)).thenReturn(storedMessage);

@@ -2,7 +2,9 @@ package com.connectchat.storage;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.connectchat.storage.repository.StorageInboxMessageRepository;
+import com.connectchat.storage.repository.StorageStatusInboxMessageRepository;
 import com.connectchat.storage.repository.StoredMessageRepository;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -28,6 +30,12 @@ class MessageStorageServiceApplicationTests {
 
 	@MockitoBean
 	CqlSession cqlSession;
+
+    @MockitoBean
+    StorageStatusInboxMessageRepository storageStatusInboxMessageRepository;
+
+    @MockitoBean
+    ConnectionFactory connectionFactory;
 
 	@Test
 	void contextLoads() {

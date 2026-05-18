@@ -61,7 +61,7 @@ public class StoredMessage {
             .senderId(inboxMessage.getSenderId())
             .recipientId(inboxMessage.getRecipientId())
             .content(inboxMessage.getContent())
-            .status(StoredMessageStatus.RECEIVED.name())
+            .status(StoredMessageStatus.SENT.name())
             .sentAt(
                 inboxMessage.getEventOccurredAt() != null
                     ? inboxMessage.getEventOccurredAt()
@@ -72,6 +72,10 @@ public class StoredMessage {
     }
 
     public void updateStatus(StoredMessageStatus newStatus) {
+        StoredMessageStatus currentStatus = StoredMessageStatus.valueOf(status);
+        if (newStatus.ordinal() < currentStatus.ordinal()) {
+            return;
+        }
         status = newStatus.name();
         updatedAt = Instant.now();
     }

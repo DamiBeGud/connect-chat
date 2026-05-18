@@ -19,14 +19,33 @@ public class MessageStorageMessagingConfiguration {
 
     @Bean
     Queue privateMessageQueue(MessageStorageMessagingProperties properties) {
-        return new Queue(properties.privateMessageQueue(), true);
+        return queue(properties.privateMessageQueue());
+    }
+
+    @Bean
+    Queue statusRequestQueue(MessageStorageMessagingProperties properties) {
+        return queue(properties.statusRequestQueue());
     }
 
     @Bean
     DirectExchange privateMessageExchange(
         MessageStorageMessagingProperties properties
     ) {
-        return new DirectExchange(properties.privateMessageExchange(), true, false);
+        return exchange(properties.privateMessageExchange());
+    }
+
+    @Bean
+    DirectExchange statusRequestExchange(
+        MessageStorageMessagingProperties properties
+    ) {
+        return exchange(properties.statusRequestExchange());
+    }
+
+    @Bean
+    DirectExchange statusConfirmedExchange(
+        MessageStorageMessagingProperties properties
+    ) {
+        return exchange(properties.statusConfirmedExchange());
     }
 
     @Bean
@@ -35,10 +54,24 @@ public class MessageStorageMessagingConfiguration {
         DirectExchange privateMessageExchange,
         MessageStorageMessagingProperties properties
     ) {
-        return BindingBuilder
-            .bind(privateMessageQueue)
-            .to(privateMessageExchange)
-            .with(properties.privateMessageRoutingKey());
+        return binding(
+            privateMessageQueue,
+            privateMessageExchange,
+            properties.privateMessageRoutingKey()
+        );
+    }
+
+    @Bean
+    Binding statusRequestBinding(
+        Queue statusRequestQueue,
+        DirectExchange statusRequestExchange,
+        MessageStorageMessagingProperties properties
+    ) {
+        return binding(
+            statusRequestQueue,
+            statusRequestExchange,
+            properties.statusRequestRoutingKey()
+        );
     }
 
     @Bean
@@ -66,5 +99,17 @@ public class MessageStorageMessagingConfiguration {
         factory.setConnectionFactory(connectionFactory);
         factory.setMessageConverter(rabbitMessageConverter);
         return factory;
+    }
+
+    private Queue queue(String name) {
+        return new Queue(name, true);
+    }
+
+    private DirectExchange exchange(String name) {
+        return new DirectExchange(name, true, false);
+    }
+
+    private Binding binding(Queue queue, DirectExchange exchange, String routingKey) {
+        return BindingBuilder.bind(queue).to(exchange).with(routingKey);
     }
 }

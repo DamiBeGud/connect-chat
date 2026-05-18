@@ -7,6 +7,12 @@ chat:
     private-message-queue: ${CHAT_PRIVATE_MESSAGE_QUEUE:chat.private-message.queue}
     private-message-exchange: ${CHAT_PRIVATE_MESSAGE_EXCHANGE:chat.private-message.exchange}
     private-message-routing-key: ${CHAT_PRIVATE_MESSAGE_ROUTING_KEY:chat.private-message}
+    status-request-queue: ${CHAT_STATUS_REQUEST_QUEUE:chat.message-status.request.queue}
+    status-request-exchange: ${CHAT_STATUS_REQUEST_EXCHANGE:chat.message-status.request.exchange}
+    status-request-routing-key: ${CHAT_STATUS_REQUEST_ROUTING_KEY:chat.message-status.request}
+    status-confirmed-queue: ${CHAT_STATUS_CONFIRMED_QUEUE:chat.message-status.confirmed.queue}
+    status-confirmed-exchange: ${CHAT_STATUS_CONFIRMED_EXCHANGE:chat.message-status.confirmed.exchange}
+    status-confirmed-routing-key: ${CHAT_STATUS_CONFIRMED_ROUTING_KEY:chat.message-status.confirmed}
     outbox-batch-size: ${CHAT_OUTBOX_BATCH_SIZE:50}
     inbox-batch-size: ${CHAT_INBOX_BATCH_SIZE:50}
     outbox-processing-delay: ${CHAT_OUTBOX_PROCESSING_DELAY:1000}

@@ -1,12 +1,11 @@
 package com.connectchat.storage.service.implementation;
 
-import com.connectchat.storage.common.messaging.config.MessageStorageMessagingProperties;
 import com.connectchat.storage.common.messaging.MessageStatusEvent;
 import com.connectchat.storage.common.messaging.RabbitMessageStatusPublisher;
-import com.connectchat.storage.entity.StoredMessageStatus;
-import com.connectchat.storage.entity.StorageInboxMessage;
+import com.connectchat.storage.common.messaging.config.MessageStorageMessagingProperties;
+import com.connectchat.storage.entity.StorageStatusInboxMessage;
 import com.connectchat.storage.service.MessageStorageService;
-import com.connectchat.storage.service.StorageInboxService;
+import com.connectchat.storage.service.StorageStatusInboxService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,9 +15,9 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class StorageInboxProcessor {
+public class StorageStatusInboxProcessor {
 
-    private final StorageInboxService storageInboxService;
+    private final StorageStatusInboxService storageStatusInboxService;
     private final MessageStorageService messageStorageService;
     private final RabbitMessageStatusPublisher rabbitMessageStatusPublisher;
     private final MessageStorageMessagingProperties properties;
@@ -27,36 +26,36 @@ public class StorageInboxProcessor {
         fixedDelayString = "${message-storage.messaging.inbox-processing-delay:1000}"
     )
     public void processInboxMessages() {
-        List<StorageInboxMessage> messages = storageInboxService.claimNextBatch(
-            properties.inboxBatchSize()
-        );
+        List<StorageStatusInboxMessage> messages =
+            storageStatusInboxService.claimNextBatch(properties.inboxBatchSize());
 
         StorageBatchProcessingSupport.processBatch(
             messages,
             message -> {
-                messageStorageService.store(message);
+                messageStorageService.updateStatus(
+                    message.getMessageId(),
+                    message.getStatusValue()
+                );
                 rabbitMessageStatusPublisher.publish(
                     new MessageStatusEvent(
-                        java.util.UUID.randomUUID(),
-                        message.getSourceMessageId() != null
-                            ? message.getSourceMessageId()
-                            : message.getId(),
+                        message.getSourceEventId(),
+                        message.getMessageId(),
                         message.getSenderId(),
                         message.getRecipientId(),
-                        StoredMessageStatus.SENT,
-                        message.getSenderId(),
+                        message.getStatusValue(),
+                        message.getActorUserId(),
                         message.getEventOccurredAt()
                     )
                 );
             },
-            message -> storageInboxService.markProcessed(message.getId()),
+            message -> storageStatusInboxService.markProcessed(message.getId()),
             (message, exception) ->
-                storageInboxService.markFailed(
+                storageStatusInboxService.markFailed(
                     message.getId(),
                     exception.getMessage()
                 ),
-            StorageInboxMessage::getId,
-            "Failed to persist inbox message id={}"
+            StorageStatusInboxMessage::getId,
+            "Failed to update stored message status id={}"
         );
     }
 }

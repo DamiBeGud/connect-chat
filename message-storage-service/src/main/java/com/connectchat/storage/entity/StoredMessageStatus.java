@@ -1,7 +1,7 @@
 package com.connectchat.storage.entity;
 
 public enum StoredMessageStatus {
-    RECEIVED,
+    SENT,
     DELIVERED,
     READ,
     FAILED,
