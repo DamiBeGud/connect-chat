@@ -5,6 +5,8 @@ import com.connectchat.storage.entity.StoredMessage;
 import com.connectchat.storage.entity.StoredMessageStatus;
 import com.connectchat.storage.repository.StoredMessageRepository;
 import com.connectchat.storage.service.MessageStorageService;
+import com.connectchat.storage.service.StoredMessageStatusUpdateResult;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,15 +25,23 @@ public class MessageStorageServiceImpl implements MessageStorageService {
     }
 
     @Override
-    public StoredMessage updateStatus(UUID messageId, StoredMessageStatus status) {
-        StoredMessage storedMessage = storedMessageRepository
-            .findById(messageId)
-            .orElseThrow(() ->
-                new IllegalArgumentException(
-                    "Stored message not found: " + messageId
-                )
+    public Optional<StoredMessageStatusUpdateResult> updateStatus(
+        UUID messageId,
+        StoredMessageStatus status
+    ) {
+        // Status events can arrive before the initial message create event is
+        // stored. Returning empty lets the inbox processor requeue the event
+        // instead of treating that race as a terminal failure.
+        return storedMessageRepository.findById(messageId).map(storedMessage -> {
+            boolean statusChanged = storedMessage.updateStatus(status);
+            if (statusChanged) {
+                storedMessage = storedMessageRepository.save(storedMessage);
+            }
+
+            return new StoredMessageStatusUpdateResult(
+                storedMessage,
+                statusChanged
             );
-        storedMessage.updateStatus(status);
-        return storedMessageRepository.save(storedMessage);
+        });
     }
 }

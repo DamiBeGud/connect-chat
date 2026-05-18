@@ -10,6 +10,8 @@ public interface StorageStatusInboxService {
 
     List<StorageStatusInboxMessage> claimNextBatch(int batchSize);
 
+    void markPending(UUID id);
+
     void markProcessed(UUID id);
 
     void markFailed(UUID id, String failureReason);

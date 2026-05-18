@@ -37,7 +37,10 @@ public class StorageInboxProcessor {
                 messageStorageService.store(message);
                 rabbitMessageStatusPublisher.publish(
                     new MessageStatusEvent(
-                        java.util.UUID.randomUUID(),
+                        // Reuse the inbox row id so a retried SENT confirmation
+                        // is deduplicated downstream instead of looking like a
+                        // brand-new status event.
+                        message.getId(),
                         message.getSourceMessageId() != null
                             ? message.getSourceMessageId()
                             : message.getId(),

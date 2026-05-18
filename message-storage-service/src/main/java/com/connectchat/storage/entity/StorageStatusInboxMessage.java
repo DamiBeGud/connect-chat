@@ -110,6 +110,11 @@ public class StorageStatusInboxMessage {
         errorMessage = failureReason;
     }
 
+    public void markPending() {
+        status = MessageInboxStatus.PENDING;
+        lockedAt = null;
+    }
+
     @PrePersist
     void initialize() {
         if (id == null) {

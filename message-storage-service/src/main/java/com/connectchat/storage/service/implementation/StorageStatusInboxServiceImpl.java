@@ -39,6 +39,12 @@ public class StorageStatusInboxServiceImpl implements StorageStatusInboxService 
 
     @Override
     @Transactional
+    public void markPending(UUID id) {
+        repository.findById(id).ifPresent(StorageStatusInboxMessage::markPending);
+    }
+
+    @Override
+    @Transactional
     public void markProcessed(UUID id) {
         repository.findById(id).ifPresent(StorageStatusInboxMessage::markProcessed);
     }

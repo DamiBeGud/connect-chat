@@ -71,12 +71,15 @@ public class StoredMessage {
             .build();
     }
 
-    public void updateStatus(StoredMessageStatus newStatus) {
+    public boolean updateStatus(StoredMessageStatus newStatus) {
         StoredMessageStatus currentStatus = StoredMessageStatus.valueOf(status);
-        if (newStatus.ordinal() < currentStatus.ordinal()) {
-            return;
+        // Ignore duplicate or stale updates so late DELIVERED events cannot
+        // overwrite a newer READ state that is already persisted.
+        if (newStatus.ordinal() <= currentStatus.ordinal()) {
+            return false;
         }
         status = newStatus.name();
         updatedAt = Instant.now();
+        return true;
     }
 }

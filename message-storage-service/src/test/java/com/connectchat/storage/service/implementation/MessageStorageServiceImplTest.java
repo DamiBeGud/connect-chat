@@ -1,7 +1,7 @@
 package com.connectchat.storage.service.implementation;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -9,6 +9,7 @@ import com.connectchat.storage.entity.StorageInboxMessage;
 import com.connectchat.storage.entity.StoredMessage;
 import com.connectchat.storage.entity.StoredMessageStatus;
 import com.connectchat.storage.repository.StoredMessageRepository;
+import com.connectchat.storage.service.StoredMessageStatusUpdateResult;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -45,25 +46,45 @@ class MessageStorageServiceImplTest {
         when(repository.findById(messageId)).thenReturn(Optional.of(storedMessage));
         when(repository.save(storedMessage)).thenReturn(storedMessage);
 
-        StoredMessage updated = service.updateStatus(
+        StoredMessageStatusUpdateResult updateResult = service
+            .updateStatus(
             messageId,
             StoredMessageStatus.DELIVERED
-        );
+        )
+            .orElseThrow();
 
-        assertThat(updated.getStatus()).isEqualTo(
+        assertThat(updateResult.statusChanged()).isTrue();
+        assertThat(updateResult.storedMessage().getStatus()).isEqualTo(
             StoredMessageStatus.DELIVERED.name()
         );
         verify(repository).save(storedMessage);
     }
 
     @Test
-    void throwsWhenUpdatingMissingStoredMessage() {
+    void returnsEmptyWhenUpdatingMissingStoredMessage() {
         UUID messageId = UUID.randomUUID();
         when(repository.findById(messageId)).thenReturn(Optional.empty());
 
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> service.updateStatus(messageId, StoredMessageStatus.READ)
+        assertThat(service.updateStatus(messageId, StoredMessageStatus.READ)).isEmpty();
+    }
+
+    @Test
+    void doesNotSaveOrSignalChangeForStaleStatusUpdate() {
+        UUID messageId = UUID.randomUUID();
+        StoredMessage storedMessage = StoredMessage.builder()
+            .messageId(messageId)
+            .status(StoredMessageStatus.READ.name())
+            .build();
+        when(repository.findById(messageId)).thenReturn(Optional.of(storedMessage));
+
+        StoredMessageStatusUpdateResult updateResult = service
+            .updateStatus(messageId, StoredMessageStatus.DELIVERED)
+            .orElseThrow();
+
+        assertThat(updateResult.statusChanged()).isFalse();
+        assertThat(updateResult.storedMessage().getStatus()).isEqualTo(
+            StoredMessageStatus.READ.name()
         );
+        verify(repository, never()).save(storedMessage);
     }
 }
