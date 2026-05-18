@@ -1,7 +1,7 @@
 package com.connectchat.chat.service.implementation;
 
+import com.connectchat.chat.common.messaging.PrivateMessageEvent;
 import com.connectchat.chat.entity.InboxMessage;
-import com.connectchat.chat.entity.OutboxMessage;
 import com.connectchat.chat.repository.InboxMessageRepository;
 import com.connectchat.chat.service.InboxService;
 import java.util.ArrayList;
@@ -19,18 +19,15 @@ public class InboxServiceImpl implements InboxService {
 
     @Override
     @Transactional
-    public void enqueueFromOutbox(OutboxMessage outboxMessage) {
+    public void enqueue(PrivateMessageEvent event) {
         if (
-            inboxMessageRepository.existsBySourceOutboxMessageId(
-                outboxMessage.getId()
-            )
+            event.messageId() != null &&
+            inboxMessageRepository.existsBySourceMessageId(event.messageId())
         ) {
             return;
         }
 
-        inboxMessageRepository.save(
-            InboxMessage.fromOutboxMessage(outboxMessage)
-        );
+        inboxMessageRepository.save(InboxMessage.fromEvent(event));
     }
 
     @Override

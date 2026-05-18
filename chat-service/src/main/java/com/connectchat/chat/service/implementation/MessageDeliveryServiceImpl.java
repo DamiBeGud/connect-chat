@@ -23,11 +23,11 @@ public class MessageDeliveryServiceImpl implements MessageDeliveryService {
     @Override
     public void deliver(PrivateMessageCommand command) {
         PrivateMessageResponse message = new PrivateMessageResponse(
-            UUID.randomUUID(),
+            command.messageId() != null ? command.messageId() : UUID.randomUUID(),
             command.senderId(),
             command.recipientId(),
             command.content(),
-            Instant.now(clock)
+            command.occurredAt() != null ? command.occurredAt() : Instant.now(clock)
         );
 
         messagingTemplate.convertAndSendToUser(

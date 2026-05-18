@@ -1,12 +1,12 @@
 package com.connectchat.chat.service;
 
+import com.connectchat.chat.common.messaging.PrivateMessageEvent;
 import com.connectchat.chat.entity.InboxMessage;
-import com.connectchat.chat.entity.OutboxMessage;
 import java.util.List;
 import java.util.UUID;
 
 public interface InboxService {
-    void enqueueFromOutbox(OutboxMessage outboxMessage);
+    void enqueue(PrivateMessageEvent event);
 
     List<InboxMessage> claimNextBatch(int batchSize);
 

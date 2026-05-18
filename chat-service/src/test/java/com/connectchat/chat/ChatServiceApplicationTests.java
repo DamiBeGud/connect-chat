@@ -3,6 +3,7 @@ package com.connectchat.chat;
 import com.connectchat.chat.repository.InboxMessageRepository;
 import com.connectchat.chat.repository.OutboxMessageRepository;
 import org.junit.jupiter.api.Test;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
@@ -26,6 +27,9 @@ class ChatServiceApplicationTests {
 
 	@MockitoBean
 	InboxMessageRepository inboxMessageRepository;
+
+    @MockitoBean
+    ConnectionFactory connectionFactory;
 
 	@Test
 	void contextLoads() {

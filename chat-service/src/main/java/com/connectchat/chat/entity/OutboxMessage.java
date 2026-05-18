@@ -1,5 +1,6 @@
 package com.connectchat.chat.entity;
 
+import com.connectchat.chat.common.messaging.PrivateMessageEvent;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -63,6 +64,16 @@ public class OutboxMessage {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
+
+    public PrivateMessageEvent toEvent() {
+        return new PrivateMessageEvent(
+            id,
+            senderId,
+            recipientId,
+            content,
+            createdAt != null ? createdAt : Instant.now()
+        );
+    }
 
     public void markProcessing() {
         status = MessageProcessingStatus.PROCESSING;

@@ -3,7 +3,7 @@ package com.connectchat.chat.common.messaging;
 import java.time.Instant;
 import java.util.UUID;
 
-public record PrivateMessageCommand(
+public record PrivateMessageEvent(
     UUID messageId,
     UUID senderId,
     UUID recipientId,

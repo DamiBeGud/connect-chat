@@ -30,12 +30,15 @@ class MessageDeliveryServiceImplTest {
 
     @Test
     void deliversPrivateMessageToRecipientAndSender() {
+        UUID messageId = UUID.randomUUID();
         UUID senderId = UUID.randomUUID();
         UUID recipientId = UUID.randomUUID();
         PrivateMessageCommand command = new PrivateMessageCommand(
+            messageId,
             senderId,
             recipientId,
-            "hello"
+            "hello",
+            Instant.parse("2026-05-06T10:15:30Z")
         );
 
         service.deliver(command);
@@ -44,6 +47,7 @@ class MessageDeliveryServiceImplTest {
             eq(recipientId.toString()),
             eq(MessageDeliveryServiceImpl.PRIVATE_MESSAGES_DESTINATION),
             argThat((PrivateMessageResponse message) ->
+                messageId.equals(message.messageId()) &&
                 senderId.equals(message.senderId()) &&
                 recipientId.equals(message.recipientId()) &&
                 "hello".equals(message.content()) &&
@@ -54,6 +58,7 @@ class MessageDeliveryServiceImplTest {
             eq(senderId.toString()),
             eq(MessageDeliveryServiceImpl.PRIVATE_MESSAGES_DESTINATION),
             argThat((PrivateMessageResponse message) ->
+                messageId.equals(message.messageId()) &&
                 senderId.equals(message.senderId()) &&
                 recipientId.equals(message.recipientId()) &&
                 "hello".equals(message.content()) &&

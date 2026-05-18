@@ -1,5 +1,6 @@
 package com.connectchat.chat.entity;
 
+import com.connectchat.chat.common.messaging.PrivateMessageEvent;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -30,12 +31,12 @@ public class InboxMessage {
     private UUID id;
 
     @Column(
-        name = "source_outbox_message_id",
+        name = "source_message_id",
         nullable = false,
         unique = true,
         updatable = false
     )
-    private UUID sourceOutboxMessageId;
+    private UUID sourceMessageId;
 
     @Column(name = "sender_id", nullable = false, updatable = false)
     private UUID senderId;
@@ -45,6 +46,9 @@ public class InboxMessage {
 
     @Column(nullable = false, length = 4_000, updatable = false)
     private String content;
+
+    @Column(name = "occurred_at", updatable = false)
+    private Instant occurredAt;
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
@@ -72,12 +76,13 @@ public class InboxMessage {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
-    public static InboxMessage fromOutboxMessage(OutboxMessage outboxMessage) {
+    public static InboxMessage fromEvent(PrivateMessageEvent event) {
         return InboxMessage.builder()
-            .sourceOutboxMessageId(outboxMessage.getId())
-            .senderId(outboxMessage.getSenderId())
-            .recipientId(outboxMessage.getRecipientId())
-            .content(outboxMessage.getContent())
+            .sourceMessageId(event.messageId())
+            .senderId(event.senderId())
+            .recipientId(event.recipientId())
+            .content(event.content())
+            .occurredAt(event.occurredAt())
             .build();
     }
 

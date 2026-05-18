@@ -1,5 +1,7 @@
 package com.connectchat.chat.service.implementation;
 
+import com.connectchat.chat.common.messaging.RabbitPrivateMessagePublisher;
+import com.connectchat.chat.common.messaging.config.ChatMessagingProperties;
 import com.connectchat.chat.common.messaging.PrivateMessageCommand;
 import com.connectchat.chat.entity.InboxMessage;
 import com.connectchat.chat.entity.OutboxMessage;
@@ -9,7 +11,6 @@ import com.connectchat.chat.service.OutboxService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -19,26 +20,24 @@ import org.springframework.stereotype.Service;
 public class ChatMessagePipelineService {
 
     private final OutboxService outboxService;
+    private final RabbitPrivateMessagePublisher rabbitPrivateMessagePublisher;
     private final InboxService inboxService;
     private final MessageDeliveryService messageDeliveryService;
-
-    @Value("${chat.messaging.outbox-batch-size:50}")
-    private int outboxBatchSize;
-
-    @Value("${chat.messaging.inbox-batch-size:50}")
-    private int inboxBatchSize;
+    private final ChatMessagingProperties properties;
 
     @Scheduled(fixedDelayString = "${chat.messaging.outbox-processing-delay:1000}")
     public void processOutboxMessages() {
-        List<OutboxMessage> messages = outboxService.claimNextBatch(outboxBatchSize);
+        List<OutboxMessage> messages = outboxService.claimNextBatch(
+            properties.outboxBatchSize()
+        );
         for (OutboxMessage message : messages) {
             try {
-                inboxService.enqueueFromOutbox(message);
+                rabbitPrivateMessagePublisher.publish(message.toEvent());
                 outboxService.markProcessed(message.getId());
             } catch (RuntimeException exception) {
                 outboxService.markFailed(message.getId(), exception.getMessage());
                 log.warn(
-                    "Failed to move outbox message id={} to inbox",
+                    "Failed to publish outbox message id={} to RabbitMQ",
                     message.getId(),
                     exception
                 );
@@ -48,14 +47,18 @@ public class ChatMessagePipelineService {
 
     @Scheduled(fixedDelayString = "${chat.messaging.inbox-processing-delay:1000}")
     public void processInboxMessages() {
-        List<InboxMessage> messages = inboxService.claimNextBatch(inboxBatchSize);
+        List<InboxMessage> messages = inboxService.claimNextBatch(
+            properties.inboxBatchSize()
+        );
         for (InboxMessage message : messages) {
             try {
                 messageDeliveryService.deliver(
                     new PrivateMessageCommand(
+                        message.getSourceMessageId(),
                         message.getSenderId(),
                         message.getRecipientId(),
-                        message.getContent()
+                        message.getContent(),
+                        message.getOccurredAt()
                     )
                 );
                 inboxService.markProcessed(message.getId());

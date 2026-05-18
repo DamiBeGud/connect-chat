@@ -5,10 +5,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.connectchat.chat.common.messaging.PrivateMessageEvent;
 import com.connectchat.chat.entity.InboxMessage;
 import com.connectchat.chat.entity.MessageProcessingStatus;
-import com.connectchat.chat.entity.OutboxMessage;
 import com.connectchat.chat.repository.InboxMessageRepository;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -21,35 +22,33 @@ class InboxServiceImplTest {
     private final InboxServiceImpl service = new InboxServiceImpl(repository);
 
     @Test
-    void enqueuesInboxMessageFromOutboxOnce() {
-        OutboxMessage outboxMessage = OutboxMessage.builder()
-            .id(UUID.randomUUID())
-            .senderId(UUID.randomUUID())
-            .recipientId(UUID.randomUUID())
-            .content("hello")
-            .build();
-        when(
-            repository.existsBySourceOutboxMessageId(outboxMessage.getId())
-        ).thenReturn(false);
+    void enqueuesInboxMessageFromEventOnce() {
+        PrivateMessageEvent event = new PrivateMessageEvent(
+            UUID.randomUUID(),
+            UUID.randomUUID(),
+            UUID.randomUUID(),
+            "hello",
+            Instant.now()
+        );
+        when(repository.existsBySourceMessageId(event.messageId())).thenReturn(false);
 
-        service.enqueueFromOutbox(outboxMessage);
+        service.enqueue(event);
 
-        verify(repository).save(anyInboxMessageFor(outboxMessage));
+        verify(repository).save(anyInboxMessageFor(event));
     }
 
     @Test
     void skipsDuplicateInboxMessage() {
-        OutboxMessage outboxMessage = OutboxMessage.builder()
-            .id(UUID.randomUUID())
-            .senderId(UUID.randomUUID())
-            .recipientId(UUID.randomUUID())
-            .content("hello")
-            .build();
-        when(
-            repository.existsBySourceOutboxMessageId(outboxMessage.getId())
-        ).thenReturn(true);
+        PrivateMessageEvent event = new PrivateMessageEvent(
+            UUID.randomUUID(),
+            UUID.randomUUID(),
+            UUID.randomUUID(),
+            "hello",
+            Instant.now()
+        );
+        when(repository.existsBySourceMessageId(event.messageId())).thenReturn(true);
 
-        service.enqueueFromOutbox(outboxMessage);
+        service.enqueue(event);
 
         verify(repository, never()).save(org.mockito.ArgumentMatchers.any());
     }
@@ -57,7 +56,7 @@ class InboxServiceImplTest {
     @Test
     void claimsPendingInboxMessagesAndMarksThemProcessing() {
         InboxMessage message = InboxMessage.builder()
-            .sourceOutboxMessageId(UUID.randomUUID())
+            .sourceMessageId(UUID.randomUUID())
             .senderId(UUID.randomUUID())
             .recipientId(UUID.randomUUID())
             .content("hello")
@@ -73,12 +72,13 @@ class InboxServiceImplTest {
         assertThat(message.getAttempts()).isEqualTo(1);
     }
 
-    private InboxMessage anyInboxMessageFor(OutboxMessage outboxMessage) {
+    private InboxMessage anyInboxMessageFor(PrivateMessageEvent event) {
         return org.mockito.ArgumentMatchers.argThat(message ->
-            outboxMessage.getId().equals(message.getSourceOutboxMessageId()) &&
-            outboxMessage.getSenderId().equals(message.getSenderId()) &&
-            outboxMessage.getRecipientId().equals(message.getRecipientId()) &&
-            outboxMessage.getContent().equals(message.getContent())
+            event.messageId().equals(message.getSourceMessageId()) &&
+            event.senderId().equals(message.getSenderId()) &&
+            event.recipientId().equals(message.getRecipientId()) &&
+            event.content().equals(message.getContent()) &&
+            event.occurredAt().equals(message.getOccurredAt())
         );
     }
 }

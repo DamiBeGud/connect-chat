@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface InboxMessageRepository extends JpaRepository<InboxMessage, UUID> {
-    boolean existsBySourceOutboxMessageId(UUID sourceOutboxMessageId);
+    boolean existsBySourceMessageId(UUID sourceMessageId);
 
     @Query(
         value = """
