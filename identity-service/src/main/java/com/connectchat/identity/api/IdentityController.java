@@ -3,11 +3,14 @@ package com.connectchat.identity.api;
 import com.connectchat.identity.api.request.RefreshTokenRequest;
 import com.connectchat.identity.api.request.RegisterRequest;
 import com.connectchat.identity.api.request.RegisterVerificationRequest;
+import com.connectchat.identity.api.request.ServiceTokenRequest;
 import com.connectchat.identity.api.response.AuthTokenResponse;
 import com.connectchat.identity.api.response.AuthTokenValidationResponse;
+import com.connectchat.identity.api.response.ServiceTokenResponse;
 import com.connectchat.identity.common.web.Response;
 import com.connectchat.identity.common.web.ResponseFactory;
 import com.connectchat.identity.service.AuthService;
+import com.connectchat.identity.service.ServiceTokenService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class IdentityController {
 
     private final AuthService authService;
+    private final ServiceTokenService serviceTokenService;
     private final ResponseFactory responseFactory;
 
     @GetMapping("")
@@ -74,6 +78,21 @@ public class IdentityController {
                 HttpStatus.OK,
                 "Token refreshed",
                 tokens
+            )
+        );
+    }
+
+    @PostMapping("/auth/service-token")
+    public ResponseEntity<Response<ServiceTokenResponse>> serviceToken(
+        @Valid @RequestBody ServiceTokenRequest request
+    ) {
+        ServiceTokenResponse token = serviceTokenService.issueToken(request);
+
+        return ResponseEntity.ok(
+            responseFactory.success(
+                HttpStatus.OK,
+                "Service token issued",
+                token
             )
         );
     }

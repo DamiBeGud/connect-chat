@@ -6,6 +6,9 @@ chat:
   instance:
     pod-id: ${CHAT_SERVICE_INSTANCE_ID:local-chat-service-1}
     service-name: ${CHAT_SERVICE_NAME:chat-service}
+  service-client:
+    client-id: ${CHAT_SERVICE_CLIENT_ID:chat-service}
+    client-secret: ${CHAT_SERVICE_CLIENT_SECRET:local-chat-service-secret}
   messaging:
     private-message-queue: ${CHAT_PRIVATE_MESSAGE_QUEUE:chat.private-message.queue}
     private-message-exchange: ${CHAT_PRIVATE_MESSAGE_EXCHANGE:chat.private-message.exchange}
@@ -24,7 +27,10 @@ chat:
 presence:
   service:
     base-url: ${PRESENCE_SERVICE_BASE_URL:http://localhost:8085}
-    token: ${CHAT_SERVICE_TOKEN:}
+
+identity:
+  service:
+    base-url: ${IDENTITY_SERVICE_BASE_URL:http://localhost:8081}
 
 management:
   endpoints:

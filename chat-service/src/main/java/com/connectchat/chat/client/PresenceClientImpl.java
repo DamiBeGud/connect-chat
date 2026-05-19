@@ -7,15 +7,12 @@ import com.connectchat.chat.client.response.PresenceResponse;
 import com.connectchat.chat.client.response.UserOnlineResponse;
 import java.util.List;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClient;
 
 @Component
-@RequiredArgsConstructor
 public class PresenceClientImpl implements PresenceClient {
 
     private static final ParameterizedTypeReference<
@@ -30,10 +27,17 @@ public class PresenceClientImpl implements PresenceClient {
         ClientResponse<UserOnlineResponse>
     > USER_ONLINE_RESPONSE_TYPE = new ParameterizedTypeReference<>() {};
 
+    @Qualifier("presenceRestClient")
     private final RestClient presenceRestClient;
+    private final ServiceTokenProvider serviceTokenProvider;
 
-    @Value("${presence.service.token}")
-    private String serviceToken;
+    public PresenceClientImpl(
+        @Qualifier("presenceRestClient") RestClient presenceRestClient,
+        ServiceTokenProvider serviceTokenProvider
+    ) {
+        this.presenceRestClient = presenceRestClient;
+        this.serviceTokenProvider = serviceTokenProvider;
+    }
 
     @Override
     public void registerSession(
@@ -98,11 +102,7 @@ public class PresenceClientImpl implements PresenceClient {
     }
 
     private String authorizationHeader() {
-        if (!StringUtils.hasText(serviceToken)) {
-            throw new IllegalStateException("Missing chat service token for presence-service");
-        }
-
-        return "Bearer " + serviceToken;
+        return serviceTokenProvider.authorizationHeader();
     }
 
     private <T> T requireData(ClientResponse<T> response) {

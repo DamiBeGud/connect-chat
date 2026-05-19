@@ -15,6 +15,10 @@ identity:
     refresh-token-expiration-ms: ${IDENTITY_JWT_REFRESH_TOKEN_EXPIRATION_MS:2592000000}
     service-token-expiration-ms: ${IDENTITY_JWT_SERVICE_TOKEN_EXPIRATION_MS:900000}
     issuer: ${IDENTITY_JWT_ISSUER:http://identity-service:8081}
+  internal-clients:
+    chat-service:
+      client-id: ${IDENTITY_INTERNAL_CLIENT_CHAT_SERVICE_ID:chat-service}
+      client-secret: ${IDENTITY_INTERNAL_CLIENT_CHAT_SERVICE_SECRET}
   twilio:
     account-sid: ${IDENTITY_TWILIO_ACCOUNT_SID:}
     auth-token: ${IDENTITY_TWILIO_AUTH_TOKEN:}
