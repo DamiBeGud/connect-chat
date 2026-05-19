@@ -2,10 +2,13 @@ package com.connectchat.chat.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.connectchat.chat.service.WebSocketSessionLifecycleService;
 import java.time.Instant;
 import java.util.Map;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -20,8 +23,13 @@ class WebSocketAuthenticationInterceptorTest {
     private final JwtDecoder jwtDecoder = org.mockito.Mockito.mock(
         JwtDecoder.class
     );
+    private final WebSocketSessionLifecycleService webSocketSessionLifecycleService =
+        org.mockito.Mockito.mock(WebSocketSessionLifecycleService.class);
     private final WebSocketAuthenticationInterceptor interceptor =
-        new WebSocketAuthenticationInterceptor(jwtDecoder);
+        new WebSocketAuthenticationInterceptor(
+            jwtDecoder,
+            webSocketSessionLifecycleService
+        );
 
     @Test
     void authenticatesConnectFrameFromBearerToken() {
@@ -42,6 +50,10 @@ class WebSocketAuthenticationInterceptorTest {
         StompHeaderAccessor resultAccessor = StompHeaderAccessor.wrap(result);
         assertThat(resultAccessor.getUser()).isNotNull();
         assertThat(resultAccessor.getUser().getName()).isEqualTo(userId);
+        verify(webSocketSessionLifecycleService).registerSession(
+            UUID.fromString(userId),
+            "session-1"
+        );
     }
 
     @Test

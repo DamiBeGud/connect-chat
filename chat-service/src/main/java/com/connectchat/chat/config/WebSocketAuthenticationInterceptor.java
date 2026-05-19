@@ -1,8 +1,10 @@
 package com.connectchat.chat.config;
 
+import com.connectchat.chat.service.WebSocketSessionLifecycleService;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -23,11 +25,16 @@ public class WebSocketAuthenticationInterceptor implements ChannelInterceptor {
     private static final String BEARER_PREFIX = "Bearer ";
 
     private final JwtDecoder jwtDecoder;
+    private final WebSocketSessionLifecycleService webSocketSessionLifecycleService;
     private final Map<String, Principal> authenticatedSessions =
         new ConcurrentHashMap<>();
 
-    public WebSocketAuthenticationInterceptor(JwtDecoder jwtDecoder) {
+    public WebSocketAuthenticationInterceptor(
+        JwtDecoder jwtDecoder,
+        WebSocketSessionLifecycleService webSocketSessionLifecycleService
+    ) {
         this.jwtDecoder = jwtDecoder;
+        this.webSocketSessionLifecycleService = webSocketSessionLifecycleService;
     }
 
     @Override
@@ -55,18 +62,25 @@ public class WebSocketAuthenticationInterceptor implements ChannelInterceptor {
             if (StompCommand.CONNECT.equals(accessor.getCommand())) {
                 Jwt jwt = jwtDecoder.decode(resolveBearerToken(accessor));
                 Principal user = new ChatPrincipal(jwt.getSubject());
+                String sessionId = resolveSessionId(accessor);
                 accessor.setUser(user);
-                authenticatedSessions.put(resolveSessionId(accessor), user);
+                authenticatedSessions.put(sessionId, user);
+                webSocketSessionLifecycleService.registerSession(
+                    UUID.fromString(user.getName()),
+                    sessionId
+                );
                 log.info(
                     "Authenticated WebSocket session sessionId={} userId={}",
                     accessor.getSessionId(),
                     user.getName()
                 );
             } else if (StompCommand.DISCONNECT.equals(accessor.getCommand())) {
-                authenticatedSessions.remove(accessor.getSessionId());
+                String sessionId = resolveSessionId(accessor);
+                authenticatedSessions.remove(sessionId);
+                webSocketSessionLifecycleService.removeSession(sessionId);
                 log.info(
                     "Disconnected WebSocket session sessionId={}",
-                    accessor.getSessionId()
+                    sessionId
                 );
             } else if (requiresAuthenticatedUser(accessor)) {
                 Principal user = authenticatedSessions.get(

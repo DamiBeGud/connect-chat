@@ -3,6 +3,9 @@ spring:
     name: chat-service
 
 chat:
+  instance:
+    pod-id: ${CHAT_SERVICE_INSTANCE_ID:local-chat-service-1}
+    service-name: ${CHAT_SERVICE_NAME:chat-service}
   messaging:
     private-message-queue: ${CHAT_PRIVATE_MESSAGE_QUEUE:chat.private-message.queue}
     private-message-exchange: ${CHAT_PRIVATE_MESSAGE_EXCHANGE:chat.private-message.exchange}
@@ -17,6 +20,11 @@ chat:
     inbox-batch-size: ${CHAT_INBOX_BATCH_SIZE:50}
     outbox-processing-delay: ${CHAT_OUTBOX_PROCESSING_DELAY:1000}
     inbox-processing-delay: ${CHAT_INBOX_PROCESSING_DELAY:1000}
+
+presence:
+  service:
+    base-url: ${PRESENCE_SERVICE_BASE_URL:http://localhost:8085}
+    token: ${CHAT_SERVICE_TOKEN:}
 
 management:
   endpoints:

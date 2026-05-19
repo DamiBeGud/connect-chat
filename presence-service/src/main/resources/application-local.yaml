@@ -2,17 +2,12 @@ server:
   port: ${PRESENCE_SERVICE_PORT:8085}
 
 spring:
-  datasource:
-    url: ${PRESENCE_DB_URL:jdbc:postgresql://localhost:5432/presence_service}
-    username: ${PRESENCE_DB_USERNAME:postgres}
-    password: ${PRESENCE_DB_PASSWORD:postgres}
-  flyway:
-    enabled: ${PRESENCE_FLYWAY_ENABLED:true}
-    url: ${PRESENCE_FLYWAY_URL:${PRESENCE_DB_URL:jdbc:postgresql://localhost:5432/presence_service}}
-    user: ${PRESENCE_FLYWAY_USERNAME:${PRESENCE_DB_USERNAME:postgres}}
-    password: ${PRESENCE_FLYWAY_PASSWORD:${PRESENCE_DB_PASSWORD:postgres}}
   data:
     redis:
       host: ${PRESENCE_REDIS_HOST:localhost}
       port: ${PRESENCE_REDIS_PORT:6379}
       password: ${PRESENCE_REDIS_PASSWORD:}
+
+identity:
+  service:
+    base-url: ${IDENTITY_SERVICE_BASE_URL:http://localhost:8081}

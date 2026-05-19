@@ -2,6 +2,10 @@ spring:
   application:
     name: presence-service
 
+identity:
+  service:
+    base-url: ${IDENTITY_SERVICE_BASE_URL:http://localhost:8081}
+
 management:
   endpoints:
     web:
