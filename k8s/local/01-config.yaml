@@ -1,0 +1,69 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: connect-chat-config
+  namespace: connect-chat
+data:
+  POSTGRES_USER: postgres
+  POSTGRES_DB: postgres
+  POSTGRES_MULTIPLE_DATABASES: identity_service,group_service,chat_service,message_storage_service
+
+  RABBITMQ_DEFAULT_USER: guest
+
+  CASSANDRA_CLUSTER_NAME: connect-chat
+  CASSANDRA_DC: datacenter1
+  CASSANDRA_KEYSPACE: connect_chat
+
+  IDENTITY_DB_URL: jdbc:postgresql://postgres:5432/identity_service
+  IDENTITY_DB_USERNAME: postgres
+  IDENTITY_FLYWAY_ENABLED: "true"
+  IDENTITY_FLYWAY_URL: jdbc:postgresql://postgres:5432/identity_service
+  IDENTITY_FLYWAY_USERNAME: postgres
+  IDENTITY_JWT_ACCESS_TOKEN_EXPIRATION_MS: "14400000"
+  IDENTITY_JWT_REFRESH_TOKEN_EXPIRATION_MS: "2592000000"
+  IDENTITY_JWT_SERVICE_TOKEN_EXPIRATION_MS: "14400000"
+  IDENTITY_JWT_ISSUER: http://localhost:8081
+  IDENTITY_INTERNAL_CLIENT_CHAT_SERVICE_ID: chat-service
+  IDENTITY_SERVICE_BASE_URL: http://identity-service:8081
+
+  GROUP_DB_URL: jdbc:postgresql://postgres:5432/group_service
+  GROUP_DB_USERNAME: postgres
+  GROUP_FLYWAY_ENABLED: "true"
+  GROUP_FLYWAY_URL: jdbc:postgresql://postgres:5432/group_service
+  GROUP_FLYWAY_USERNAME: postgres
+
+  CHAT_DB_URL: jdbc:postgresql://postgres:5432/chat_service
+  CHAT_DB_USERNAME: postgres
+  CHAT_FLYWAY_ENABLED: "true"
+  CHAT_FLYWAY_URL: jdbc:postgresql://postgres:5432/chat_service
+  CHAT_FLYWAY_USERNAME: postgres
+  CHAT_RABBITMQ_HOST: rabbitmq
+  CHAT_RABBITMQ_PORT: "5672"
+  CHAT_RABBITMQ_USERNAME: guest
+  CHAT_CASSANDRA_CONTACT_POINTS: cassandra
+  CHAT_CASSANDRA_PORT: "9042"
+  CHAT_CASSANDRA_KEYSPACE: connect_chat
+  CHAT_CASSANDRA_DATACENTER: datacenter1
+  CHAT_CASSANDRA_SCHEMA_ACTION: NONE
+  CHAT_SERVICE_NAME: chat-service
+  CHAT_SERVICE_CLIENT_ID: chat-service
+  PRESENCE_SERVICE_BASE_URL: http://presence-service:8085
+
+  MESSAGE_STORAGE_DB_URL: jdbc:postgresql://postgres:5432/message_storage_service
+  MESSAGE_STORAGE_DB_USERNAME: postgres
+  MESSAGE_STORAGE_FLYWAY_ENABLED: "true"
+  MESSAGE_STORAGE_FLYWAY_URL: jdbc:postgresql://postgres:5432/message_storage_service
+  MESSAGE_STORAGE_FLYWAY_USERNAME: postgres
+  MESSAGE_STORAGE_RABBITMQ_HOST: rabbitmq
+  MESSAGE_STORAGE_RABBITMQ_PORT: "5672"
+  MESSAGE_STORAGE_RABBITMQ_USERNAME: guest
+  MESSAGE_STORAGE_CASSANDRA_CONTACT_POINTS: cassandra
+  MESSAGE_STORAGE_CASSANDRA_PORT: "9042"
+  MESSAGE_STORAGE_CASSANDRA_KEYSPACE: connect_chat
+  MESSAGE_STORAGE_CASSANDRA_DATACENTER: datacenter1
+  MESSAGE_STORAGE_CASSANDRA_SCHEMA_ACTION: NONE
+
+  PRESENCE_REDIS_HOST: redis
+  PRESENCE_REDIS_PORT: "6379"
+  PRESENCE_REDIS_PASSWORD: ""
+

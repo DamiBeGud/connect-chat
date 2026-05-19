@@ -1,0 +1,133 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-scripts
+  namespace: connect-chat
+data:
+  init-multiple-dbs.sh: |
+    #!/bin/sh
+    set -eu
+
+    if [ -z "${POSTGRES_MULTIPLE_DATABASES:-}" ]; then
+      exit 0
+    fi
+
+    IFS=','
+    for db in $POSTGRES_MULTIPLE_DATABASES; do
+      db="$(echo "$db" | xargs)"
+      if [ -z "$db" ]; then
+        continue
+      fi
+
+      echo "Creating database: $db"
+      psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
+        SELECT 'CREATE DATABASE "$db"'
+        WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '$db')\gexec
+    EOSQL
+    done
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-data
+  namespace: connect-chat
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: connect-chat
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postgres
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: postgres
+              containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: connect-chat-config
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: connect-chat-secret
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: connect-chat-config
+                  key: POSTGRES_DB
+            - name: POSTGRES_MULTIPLE_DATABASES
+              valueFrom:
+                configMapKeyRef:
+                  name: connect-chat-config
+                  key: POSTGRES_MULTIPLE_DATABASES
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+            - name: postgres-init-scripts
+              mountPath: /docker-entrypoint-initdb.d/init-multiple-dbs.sh
+              subPath: init-multiple-dbs.sh
+              readOnly: true
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-data
+        - name: postgres-init-scripts
+          configMap:
+            name: postgres-init-scripts
+            defaultMode: 0755
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: connect-chat
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: postgres
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: postgres
+
