@@ -5,9 +5,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.connectchat.chat.client.IdentityAuthClient;
+import com.connectchat.chat.client.response.IdentityTokenValidationResponse;
 import com.connectchat.chat.service.WebSocketSessionLifecycleService;
 import java.time.Instant;
-import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.messaging.Message;
@@ -15,19 +16,17 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 
 class WebSocketAuthenticationInterceptorTest {
 
-    private final JwtDecoder jwtDecoder = org.mockito.Mockito.mock(
-        JwtDecoder.class
+    private final IdentityAuthClient identityAuthClient = org.mockito.Mockito.mock(
+        IdentityAuthClient.class
     );
     private final WebSocketSessionLifecycleService webSocketSessionLifecycleService =
         org.mockito.Mockito.mock(WebSocketSessionLifecycleService.class);
     private final WebSocketAuthenticationInterceptor interceptor =
         new WebSocketAuthenticationInterceptor(
-            jwtDecoder,
+            identityAuthClient,
             webSocketSessionLifecycleService
         );
 
@@ -39,11 +38,13 @@ class WebSocketAuthenticationInterceptorTest {
         );
         accessor.setSessionId("session-1");
         accessor.setNativeHeader("Authorization", "Bearer token-value");
+        accessor.setLeaveMutable(true);
         Message<byte[]> message = MessageBuilder.createMessage(
             new byte[0],
             accessor.getMessageHeaders()
         );
-        when(jwtDecoder.decode("token-value")).thenReturn(jwt(userId));
+        when(identityAuthClient.validateToken("Bearer token-value"))
+            .thenReturn(userToken(userId));
 
         Message<?> result = interceptor.preSend(message, null);
 
@@ -59,7 +60,8 @@ class WebSocketAuthenticationInterceptorTest {
     @Test
     void attachesAuthenticatedUserToSubscribeFrame() {
         String userId = "7efe0aac-48b1-4f82-b5cc-85a9fa9ff7cf";
-        when(jwtDecoder.decode("token-value")).thenReturn(jwt(userId));
+        when(identityAuthClient.validateToken("Bearer token-value"))
+            .thenReturn(userToken(userId));
 
         interceptor.preSend(connectMessage("session-1"), null);
 
@@ -68,6 +70,7 @@ class WebSocketAuthenticationInterceptorTest {
         );
         accessor.setSessionId("session-1");
         accessor.setDestination("/user/queue/private-messages");
+        accessor.setLeaveMutable(true);
         Message<byte[]> message = MessageBuilder.createMessage(
             new byte[0],
             accessor.getMessageHeaders()
@@ -87,6 +90,7 @@ class WebSocketAuthenticationInterceptorTest {
         );
         accessor.setSessionId("session-1");
         accessor.setDestination("/user/queue/private-messages");
+        accessor.setLeaveMutable(true);
         Message<byte[]> message = MessageBuilder.createMessage(
             new byte[0],
             accessor.getMessageHeaders()
@@ -101,6 +105,7 @@ class WebSocketAuthenticationInterceptorTest {
         StompHeaderAccessor accessor = StompHeaderAccessor.create(
             StompCommand.CONNECT
         );
+        accessor.setLeaveMutable(true);
         Message<byte[]> message = MessageBuilder.createMessage(
             new byte[0],
             accessor.getMessageHeaders()
@@ -110,12 +115,29 @@ class WebSocketAuthenticationInterceptorTest {
             .isInstanceOf(AccessDeniedException.class);
     }
 
+    @Test
+    void rejectsConnectFrameWithServiceToken() {
+        when(identityAuthClient.validateToken("Bearer token-value"))
+            .thenReturn(
+                new IdentityTokenValidationResponse(
+                    "chat-service",
+                    "service",
+                    "INTERNAL_SERVICE",
+                    Instant.parse("2026-05-06T10:30:30Z")
+                )
+            );
+
+        assertThatThrownBy(() -> interceptor.preSend(connectMessage("session-1"), null))
+            .isInstanceOf(AccessDeniedException.class);
+    }
+
     private Message<byte[]> connectMessage(String sessionId) {
         StompHeaderAccessor accessor = StompHeaderAccessor.create(
             StompCommand.CONNECT
         );
         accessor.setSessionId(sessionId);
         accessor.setNativeHeader("Authorization", "Bearer token-value");
+        accessor.setLeaveMutable(true);
 
         return MessageBuilder.createMessage(
             new byte[0],
@@ -123,13 +145,12 @@ class WebSocketAuthenticationInterceptorTest {
         );
     }
 
-    private Jwt jwt(String subject) {
-        return new Jwt(
-            "token-value",
-            Instant.parse("2026-05-06T10:15:30Z"),
-            Instant.parse("2026-05-06T10:30:30Z"),
-            Map.of("alg", "HS256"),
-            Map.of("sub", subject)
+    private IdentityTokenValidationResponse userToken(String subject) {
+        return new IdentityTokenValidationResponse(
+            subject,
+            "user",
+            "USER",
+            Instant.parse("2026-05-06T10:30:30Z")
         );
     }
 }

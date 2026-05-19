@@ -18,8 +18,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
             + "org.springframework.boot.cassandra.autoconfigure.CassandraAutoConfiguration,"
             + "org.springframework.boot.data.cassandra.autoconfigure.DataCassandraAutoConfiguration,"
             + "org.springframework.boot.data.cassandra.autoconfigure.DataCassandraRepositoriesAutoConfiguration",
-        "identity.jwt.secret=connect-chat-local-jwt-secret-must-be-at-least-32-bytes",
-        "identity.jwt.issuer=http://localhost:8081",
     }
 )
 class ChatServiceApplicationTests {

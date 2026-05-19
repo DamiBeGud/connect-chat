@@ -2,6 +2,7 @@ package com.connectchat.chat.service.implementation;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.argThat;
 
 import com.connectchat.chat.common.messaging.PrivateMessageCommand;
 import com.connectchat.chat.common.messaging.RabbitMessageStatusRequestPublisher;
@@ -82,7 +83,15 @@ class ChatMessagePipelineServiceTest {
 
         service.processOutboxMessages();
 
-        verify(rabbitPrivateMessagePublisher).publish(outboxMessage.toEvent());
+        verify(rabbitPrivateMessagePublisher).publish(
+            argThat(event ->
+                event.messageId().equals(outboxMessage.getId()) &&
+                event.senderId().equals(outboxMessage.getSenderId()) &&
+                event.recipientId().equals(outboxMessage.getRecipientId()) &&
+                event.content().equals(outboxMessage.getContent()) &&
+                event.occurredAt() != null
+            )
+        );
         verify(outboxService).markProcessed(outboxMessage.getId());
     }
 

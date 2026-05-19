@@ -21,6 +21,5 @@ spring:
     schema-action: ${CHAT_CASSANDRA_SCHEMA_ACTION:NONE}
 
 identity:
-  jwt:
-    secret: ${IDENTITY_JWT_SECRET}
-    issuer: ${IDENTITY_JWT_ISSUER}
+  service:
+    base-url: ${IDENTITY_SERVICE_BASE_URL:http://identity-service:8081}
