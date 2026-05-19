@@ -96,17 +96,16 @@ public class GroupApplicationServiceImpl implements GroupApplicationService {
         Group group = requireGroup(groupId);
         groupAuthorizationService.requireCanManageGroup(caller, groupId);
 
-        if (group.getOwnerId().equals(userId)) {
-            throw new ForbiddenException("Group owner cannot be removed");
-        }
+        deleteMember(group, userId);
+    }
 
-        GroupMember member = groupMemberRepository
-            .findByGroupIdAndUserId(groupId, userId)
-            .orElseThrow(() ->
-                new ResourceNotFoundException("Group member was not found")
-            );
+    @Override
+    @Transactional
+    public void leaveGroup(AuthenticatedCaller caller, UUID groupId) {
+        groupAuthorizationService.requireUserToken(caller);
+        Group group = requireGroup(groupId);
 
-        groupMemberRepository.delete(member);
+        deleteMember(group, caller.requireUserId());
     }
 
     @Override
@@ -129,6 +128,20 @@ public class GroupApplicationServiceImpl implements GroupApplicationService {
     @Transactional(readOnly = true)
     public boolean isMember(UUID groupId, UUID userId) {
         return groupMemberRepository.existsByGroupIdAndUserId(groupId, userId);
+    }
+
+    private void deleteMember(Group group, UUID userId) {
+        if (group.getOwnerId().equals(userId)) {
+            throw new ForbiddenException("Group owner cannot be removed");
+        }
+
+        GroupMember member = groupMemberRepository
+            .findByGroupIdAndUserId(group.getId(), userId)
+            .orElseThrow(() ->
+                new ResourceNotFoundException("Group member was not found")
+            );
+
+        groupMemberRepository.delete(member);
     }
 
     private Group requireGroup(UUID groupId) {

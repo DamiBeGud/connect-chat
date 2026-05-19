@@ -26,6 +26,8 @@ public interface GroupApplicationService {
         UUID userId
     );
 
+    void leaveGroup(AuthenticatedCaller caller, UUID groupId);
+
     List<GroupMemberResponse> getGroupMembers(
         AuthenticatedCaller caller,
         UUID groupId

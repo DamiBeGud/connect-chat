@@ -92,6 +92,22 @@ public class GroupController {
         );
     }
 
+    @DeleteMapping("/{groupId}/members/me")
+    public ResponseEntity<Response<Void>> leaveGroup(
+        @AuthenticationPrincipal AuthenticatedCaller caller,
+        @PathVariable UUID groupId
+    ) {
+        groupApplicationService.leaveGroup(caller, groupId);
+
+        return ResponseEntity.ok(
+            responseFactory.success(
+                HttpStatus.OK,
+                "Left group",
+                null
+            )
+        );
+    }
+
     @GetMapping("/{groupId}/members")
     public ResponseEntity<Response<List<GroupMemberResponse>>> getMembers(
         @AuthenticationPrincipal AuthenticatedCaller caller,
