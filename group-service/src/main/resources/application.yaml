@@ -17,3 +17,7 @@ management:
       enabled: true
     readinessstate:
       enabled: true
+
+identity:
+  service:
+    base-url: ${IDENTITY_SERVICE_BASE_URL:http://localhost:8081}

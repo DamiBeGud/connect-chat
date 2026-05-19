@@ -4,6 +4,7 @@ import com.connectchat.identity.api.request.RefreshTokenRequest;
 import com.connectchat.identity.api.request.RegisterRequest;
 import com.connectchat.identity.api.request.RegisterVerificationRequest;
 import com.connectchat.identity.api.response.AuthTokenResponse;
+import com.connectchat.identity.api.response.AuthTokenValidationResponse;
 import com.connectchat.identity.common.web.Response;
 import com.connectchat.identity.common.web.ResponseFactory;
 import com.connectchat.identity.service.AuthService;
@@ -11,6 +12,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -71,6 +74,26 @@ public class IdentityController {
                 HttpStatus.OK,
                 "Token refreshed",
                 tokens
+            )
+        );
+    }
+
+    @PostMapping("/auth/token/validate")
+    public ResponseEntity<Response<AuthTokenValidationResponse>> validateToken(
+        @AuthenticationPrincipal Jwt jwt
+    ) {
+        AuthTokenValidationResponse validation = new AuthTokenValidationResponse(
+            jwt.getSubject(),
+            jwt.getClaimAsString("token_type"),
+            jwt.getClaimAsString("role"),
+            jwt.getExpiresAt()
+        );
+
+        return ResponseEntity.ok(
+            responseFactory.success(
+                HttpStatus.OK,
+                "Token is valid",
+                validation
             )
         );
     }

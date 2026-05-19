@@ -8,7 +8,7 @@
   },
   {
     "label": "start: group-service",
-    "command": "set -a && . ./.env && set +a && cd group-service && ./gradlew bootRun",
+    "command": "set -a && . ./.env && set +a && (cd group-service && ./gradlew bootRun) & (cd group-service && ./gradlew --continuous recompileOnChange) & wait",
     "cwd": "$ZED_WORKTREE_ROOT",
     "use_new_terminal": true,
     "allow_concurrent_runs": false

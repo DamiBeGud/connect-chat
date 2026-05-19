@@ -11,3 +11,7 @@ spring:
     url: ${GROUP_FLYWAY_URL:${GROUP_DB_URL:jdbc:postgresql://localhost:5432/group_service}}
     user: ${GROUP_FLYWAY_USERNAME:${GROUP_DB_USERNAME:postgres}}
     password: ${GROUP_FLYWAY_PASSWORD:${GROUP_DB_PASSWORD:postgres}}
+
+identity:
+  service:
+    base-url: ${IDENTITY_SERVICE_BASE_URL:http://localhost:8081}
