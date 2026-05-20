@@ -87,7 +87,7 @@ Error response shape:
 }
 ```
 
-Use ISO-8601 timestamps. UUID fields are strings.
+Use ISO-8601 timestamps. UUID fields are strings. Phone numbers use E.164 format, for example `+15551234567`.
 
 Authenticated user APIs require:
 
@@ -332,6 +332,56 @@ Response:
 }
 ```
 
+### Get User By ID
+
+Internal only. Mobile clients should not call this endpoint.
+
+```http
+GET /api/v1/identity/users/{userId}
+Authorization: Bearer <internal-service-token>
+```
+
+Response:
+
+```json
+{
+  "metadata": {
+    "status": 200,
+    "message": "User fetched"
+  },
+  "data": {
+    "userId": "793de6b4-7ced-4a80-80c7-dd22d9b90a72",
+    "phoneNumber": "+15551234567"
+  },
+  "error": null
+}
+```
+
+### Get User By Phone Number
+
+Internal only. Mobile clients should not call this endpoint. Chat-service uses it to resolve private message recipients before enqueueing messages.
+
+```http
+GET /api/v1/identity/users/by-phone/{phoneNumber}
+Authorization: Bearer <internal-service-token>
+```
+
+Response:
+
+```json
+{
+  "metadata": {
+    "status": 200,
+    "message": "User fetched"
+  },
+  "data": {
+    "userId": "ac9b3a0a-bedb-45bc-975c-9a3b83a6ca09",
+    "phoneNumber": "+15557654321"
+  },
+  "error": null
+}
+```
+
 ### Identity Smoke Check
 
 ```http
@@ -561,6 +611,7 @@ Payload received:
 {
   "messageId": "42fa8a65-a118-49c9-bd50-0ff96116d0e8",
   "senderId": "793de6b4-7ced-4a80-80c7-dd22d9b90a72",
+  "senderPhoneNumber": "+15551234567",
   "recipientId": "ac9b3a0a-bedb-45bc-975c-9a3b83a6ca09",
   "content": "Hello World",
   "sentAt": "2026-05-19T13:30:00.000000Z"
@@ -606,7 +657,7 @@ Body:
 
 ```json
 {
-  "recipientId": "ac9b3a0a-bedb-45bc-975c-9a3b83a6ca09",
+  "recipientPhoneNumber": "+15557654321",
   "content": "Hello World"
 }
 ```
@@ -615,12 +666,14 @@ Validation:
 
 | Field | Required | Rule |
 | --- | --- | --- |
-| `recipientId` | yes | UUID |
+| `recipientPhoneNumber` | yes | E.164 format |
 | `content` | yes | not blank, max 4000 chars |
 
 Notes:
 
 - The sender is resolved from the WebSocket access token.
+- Chat-service resolves `recipientPhoneNumber` to the recipient's internal UUID through identity-service before enqueueing the message.
+- The private message payload includes `senderPhoneNumber` so receivers can display the sender's phone number.
 - The message is eventually delivered to both sender and recipient on `/user/queue/private-messages`.
 - The message is also stored asynchronously by message-storage-service.
 
@@ -696,10 +749,10 @@ const client = new Client({
 
 client.activate();
 
-function sendMessage(recipientId, content) {
+function sendMessage(recipientPhoneNumber, content) {
   client.publish({
     destination: "/app/chat.private",
-    body: JSON.stringify({ recipientId, content }),
+    body: JSON.stringify({ recipientPhoneNumber, content }),
     headers: { "content-type": "application/json" },
   });
 }
@@ -964,6 +1017,6 @@ curl "http://localhost:8085/actuator/health"
 5. Connect to chat WebSocket with `Authorization: Bearer <accessToken>`.
 6. Subscribe to `/user/queue/private-messages`.
 7. Subscribe to `/user/queue/private-message-status`.
-8. Send private messages to `/app/chat.private`.
+8. Send private messages to `/app/chat.private` with `recipientPhoneNumber`.
 9. When receiving a message as recipient, publish delivered/read acknowledgements.
 10. Refresh tokens with `POST /identity/auth/token/refresh` before or after access token expiration.
