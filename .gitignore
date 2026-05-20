@@ -36,6 +36,9 @@ bin/
 *.log
 .env
 
+### Local Kubernetes secrets ###
+k8s/local/02-secret-local.override.yaml
+
 ### Local Test UIs ###
 .tests/
 .ui-test/

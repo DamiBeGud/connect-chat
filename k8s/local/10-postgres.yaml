@@ -130,4 +130,18 @@ spec:
     - name: postgres
       port: 5432
       targetPort: postgres
-
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-nodeport
+  namespace: connect-chat
+spec:
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: postgres
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: postgres
+      nodePort: 30432

@@ -42,6 +42,21 @@ If DNS for `dev0` is not set up, use the server IP instead:
 export DEV0_HOST=192.0.2.10
 ```
 
+For a Linux desktop running the stack on the same machine, use:
+
+```bash
+export DEV0_HOST=localhost
+export APP_DIR="$PWD"
+```
+
+On this kind of single-machine desktop setup, the client-facing services are reachable at `localhost:30081`, `localhost:30082`, and `localhost:30083` once k3s is running and the manifests are applied. The repo includes a helper script for the repeated deployment part:
+
+```bash
+.infra/k3s/dev0-deploy.sh
+```
+
+The helper script does not install Docker or k3s. It builds the service images, imports them into k3s containerd, applies `k8s/local`, waits for the stack, and prints the useful URLs.
+
 ## 1. Server sizing
 
 Use at least:
@@ -75,6 +90,18 @@ sudo apt-get install -y \
   git \
   gnupg \
   lsb-release \
+  tar \
+  gzip
+```
+
+On Arch-based desktops, use the equivalent packages:
+
+```bash
+sudo pacman -Syu --needed \
+  ca-certificates \
+  curl \
+  git \
+  gnupg \
   tar \
   gzip
 ```
@@ -122,12 +149,27 @@ docker version
 docker info
 ```
 
+On Arch-based desktops, Docker can be installed and enabled with:
+
+```bash
+sudo pacman -S --needed docker docker-compose
+sudo systemctl enable --now docker
+```
+
+Either add your user to the `docker` group and start a new login session:
+
+```bash
+sudo usermod -aG docker "$USER"
+```
+
+Or use `sudo docker` for the build commands. The helper script will try regular Docker first, then fall back to `sudo docker`.
+
 ## 4. Install k3s
 
 Install a single-node k3s server:
 
 ```bash
-curl -sfL https://get.k3s.io | sh -
+curl -sfL https://get.k3s.io | sudo sh -
 ```
 
 Wait for the node:
@@ -158,6 +200,14 @@ Verify:
 kubectl get nodes
 kubectl get pods -A
 ```
+
+If standalone `kubectl` is not installed, use k3s' bundled kubectl:
+
+```bash
+sudo k3s kubectl get nodes
+```
+
+The helper script can use either `kubectl` or `sudo k3s kubectl`.
 
 ## 5. Open firewall ports
 
@@ -775,7 +825,7 @@ If k3s itself needs a full reset:
 
 ```bash
 sudo /usr/local/bin/k3s-uninstall.sh
-curl -sfL https://get.k3s.io | sh -
+curl -sfL https://get.k3s.io | sudo sh -
 ```
 
 After reinstalling k3s, repeat the kubeconfig setup, image import, and manifest apply steps.
@@ -891,6 +941,13 @@ The production-ready direction is to route delivery events to the specific chat 
 ## 23. Quick command summary
 
 From a prepared `dev0` server:
+
+```bash
+cd /opt/connect-chat
+.infra/k3s/dev0-deploy.sh
+```
+
+Or run the steps manually:
 
 ```bash
 cd /opt/connect-chat
