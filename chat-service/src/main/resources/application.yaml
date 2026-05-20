@@ -19,10 +19,17 @@ chat:
     status-confirmed-queue: ${CHAT_STATUS_CONFIRMED_QUEUE:chat.message-status.confirmed.queue}
     status-confirmed-exchange: ${CHAT_STATUS_CONFIRMED_EXCHANGE:chat.message-status.confirmed.exchange}
     status-confirmed-routing-key: ${CHAT_STATUS_CONFIRMED_ROUTING_KEY:chat.message-status.confirmed}
+    private-message-listener-enabled: ${CHAT_PRIVATE_MESSAGE_LISTENER_ENABLED:false}
     outbox-batch-size: ${CHAT_OUTBOX_BATCH_SIZE:50}
     inbox-batch-size: ${CHAT_INBOX_BATCH_SIZE:50}
     outbox-processing-delay: ${CHAT_OUTBOX_PROCESSING_DELAY:1000}
     inbox-processing-delay: ${CHAT_INBOX_PROCESSING_DELAY:1000}
+  websocket-delivery:
+    batch-size: ${CHAT_WEBSOCKET_DELIVERY_BATCH_SIZE:50}
+    processing-delay: ${CHAT_WEBSOCKET_DELIVERY_PROCESSING_DELAY:500}
+    task-ttl: ${CHAT_WEBSOCKET_DELIVERY_TASK_TTL:5m}
+    stale-processing-timeout: ${CHAT_WEBSOCKET_DELIVERY_STALE_PROCESSING_TIMEOUT:30s}
+    cleanup-delay: ${CHAT_WEBSOCKET_DELIVERY_CLEANUP_DELAY:5000}
 
 presence:
   service:

@@ -4,7 +4,6 @@ import com.connectchat.chat.api.response.PrivateMessageStatusResponse;
 import com.connectchat.chat.entity.MessageStatusInboxEvent;
 import com.connectchat.chat.service.MessageStatusNotificationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,9 +12,9 @@ public class MessageStatusNotificationServiceImpl
     implements MessageStatusNotificationService {
 
     public static final String PRIVATE_MESSAGE_STATUS_DESTINATION =
-        "/queue/private-message-status";
+        WebSocketDeliveryFanoutService.PRIVATE_MESSAGE_STATUS_DESTINATION;
 
-    private final SimpMessagingTemplate messagingTemplate;
+    private final WebSocketDeliveryFanoutService fanoutService;
 
     @Override
     public void notifyUsers(MessageStatusInboxEvent event) {
@@ -28,14 +27,8 @@ public class MessageStatusNotificationServiceImpl
             event.getEventOccurredAt()
         );
 
-        messagingTemplate.convertAndSendToUser(
-            event.getSenderId().toString(),
-            PRIVATE_MESSAGE_STATUS_DESTINATION,
-            response
-        );
-        messagingTemplate.convertAndSendToUser(
-            event.getRecipientId().toString(),
-            PRIVATE_MESSAGE_STATUS_DESTINATION,
+        fanoutService.createPrivateMessageStatusTasks(
+            event.getSourceEventId(),
             response
         );
     }

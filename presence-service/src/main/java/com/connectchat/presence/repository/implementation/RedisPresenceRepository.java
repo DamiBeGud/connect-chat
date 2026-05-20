@@ -1,5 +1,6 @@
 package com.connectchat.presence.repository.implementation;
 
+import com.connectchat.presence.config.PresenceSessionProperties;
 import com.connectchat.presence.entity.PresenceSession;
 import com.connectchat.presence.entity.PresenceState;
 import com.connectchat.presence.entity.PresenceStatus;
@@ -24,6 +25,7 @@ public class RedisPresenceRepository implements PresenceRepository {
     private static final String SESSION_KEY_PREFIX = "presence:session:";
 
     private final StringRedisTemplate redisTemplate;
+    private final PresenceSessionProperties sessionProperties;
 
     @Override
     public void saveSession(PresenceSession session) {
@@ -47,6 +49,10 @@ public class RedisPresenceRepository implements PresenceRepository {
         redisTemplate
             .opsForSet()
             .add(userSessionsKey(session.userId()), session.sessionId());
+        redisTemplate.expire(
+            sessionKey(session.sessionId()),
+            sessionProperties.ttl()
+        );
     }
 
     @Override

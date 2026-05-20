@@ -2,6 +2,10 @@ spring:
   application:
     name: presence-service
 
+presence:
+  session:
+    ttl: ${PRESENCE_SESSION_TTL:30m}
+
 identity:
   service:
     base-url: ${IDENTITY_SERVICE_BASE_URL:http://localhost:8081}

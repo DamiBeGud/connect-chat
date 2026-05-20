@@ -4,6 +4,7 @@ import com.connectchat.chat.repository.InboxMessageRepository;
 import com.connectchat.chat.repository.MessageStatusInboxEventRepository;
 import com.connectchat.chat.repository.MessageStatusOutboxEventRepository;
 import com.connectchat.chat.repository.OutboxMessageRepository;
+import com.connectchat.chat.repository.WebSocketDeliveryTaskRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,6 +34,9 @@ class ChatServiceApplicationTests {
 
     @MockitoBean
     MessageStatusInboxEventRepository messageStatusInboxEventRepository;
+
+    @MockitoBean
+    WebSocketDeliveryTaskRepository webSocketDeliveryTaskRepository;
 
     @MockitoBean
     ConnectionFactory connectionFactory;

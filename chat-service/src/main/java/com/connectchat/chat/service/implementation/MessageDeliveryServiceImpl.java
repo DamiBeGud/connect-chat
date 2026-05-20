@@ -7,7 +7,6 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,9 +14,9 @@ import org.springframework.stereotype.Service;
 public class MessageDeliveryServiceImpl implements MessageDeliveryService {
 
     public static final String PRIVATE_MESSAGES_DESTINATION =
-        "/queue/private-messages";
+        WebSocketDeliveryFanoutService.PRIVATE_MESSAGES_DESTINATION;
 
-    private final SimpMessagingTemplate messagingTemplate;
+    private final WebSocketDeliveryFanoutService fanoutService;
     private final Clock clock;
 
     @Override
@@ -30,15 +29,6 @@ public class MessageDeliveryServiceImpl implements MessageDeliveryService {
             command.occurredAt() != null ? command.occurredAt() : Instant.now(clock)
         );
 
-        messagingTemplate.convertAndSendToUser(
-            command.recipientId().toString(),
-            PRIVATE_MESSAGES_DESTINATION,
-            message
-        );
-        messagingTemplate.convertAndSendToUser(
-            command.senderId().toString(),
-            PRIVATE_MESSAGES_DESTINATION,
-            message
-        );
+        fanoutService.createPrivateMessageTasks(message);
     }
 }

@@ -33,10 +33,22 @@ public class LocalSessionRegistryImpl implements LocalSessionRegistry {
     }
 
     @Override
+    public Optional<LocalSession> findSession(String sessionId) {
+        return Optional.ofNullable(sessionsById.get(sessionId));
+    }
+
+    @Override
     public boolean hasLocalSession(UUID userId) {
         return sessionsById
             .values()
             .stream()
             .anyMatch(session -> session.userId().equals(userId));
+    }
+
+    @Override
+    public boolean hasLocalSession(UUID userId, String sessionId) {
+        return findSession(sessionId)
+            .map(session -> session.userId().equals(userId))
+            .orElse(false);
     }
 }

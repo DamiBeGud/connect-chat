@@ -8,5 +8,9 @@ public interface LocalSessionRegistry {
 
     Optional<LocalSession> removeSession(String sessionId);
 
+    Optional<LocalSession> findSession(String sessionId);
+
     boolean hasLocalSession(UUID userId);
+
+    boolean hasLocalSession(UUID userId, String sessionId);
 }

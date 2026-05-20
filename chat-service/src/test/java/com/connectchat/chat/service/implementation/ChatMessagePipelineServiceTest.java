@@ -92,6 +92,15 @@ class ChatMessagePipelineServiceTest {
                 event.occurredAt() != null
             )
         );
+        verify(messageDeliveryService).deliver(
+            argThat(command ->
+                command.messageId().equals(outboxMessage.getId()) &&
+                command.senderId().equals(outboxMessage.getSenderId()) &&
+                command.recipientId().equals(outboxMessage.getRecipientId()) &&
+                command.content().equals(outboxMessage.getContent()) &&
+                command.occurredAt() != null
+            )
+        );
         verify(outboxService).markProcessed(outboxMessage.getId());
     }
 

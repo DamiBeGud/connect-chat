@@ -43,7 +43,19 @@ public class ChatMessagePipelineService {
     public void processOutboxMessages() {
         processBatch(
             outboxService.claimNextBatch(properties.outboxBatchSize()),
-            message -> rabbitPrivateMessagePublisher.publish(message.toEvent()),
+            message -> {
+                var event = message.toEvent();
+                rabbitPrivateMessagePublisher.publish(event);
+                messageDeliveryService.deliver(
+                    new PrivateMessageCommand(
+                        event.messageId(),
+                        event.senderId(),
+                        event.recipientId(),
+                        event.content(),
+                        event.occurredAt()
+                    )
+                );
+            },
             message -> outboxService.markProcessed(message.getId()),
             (message, exception) ->
                 outboxService.markFailed(message.getId(), exception.getMessage()),
