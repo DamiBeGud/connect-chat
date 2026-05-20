@@ -1,6 +1,8 @@
 package com.connectchat.chat.service.implementation;
 
 import com.connectchat.chat.api.request.PrivateMessageRequest;
+import com.connectchat.chat.client.IdentityUserClient;
+import com.connectchat.chat.client.response.IdentityUserResponse;
 import com.connectchat.chat.common.messaging.PrivateMessageStatus;
 import com.connectchat.chat.entity.OutboxMessage;
 import com.connectchat.chat.service.ChatApplicationService;
@@ -17,13 +19,21 @@ public class ChatApplicationServiceImpl implements ChatApplicationService {
 
     private final OutboxService outboxService;
     private final MessageStatusOutboxService messageStatusOutboxService;
+    private final IdentityUserClient identityUserClient;
 
     @Override
     public void handlePrivateMessage(
         UUID senderId,
         PrivateMessageRequest request
     ) {
-        outboxService.enqueuePrivateMessage(senderId, request);
+        IdentityUserResponse recipient = identityUserClient.getUserByPhoneNumber(
+            request.recipientPhoneNumber()
+        );
+        outboxService.enqueuePrivateMessage(
+            senderId,
+            recipient.userId(),
+            request.content()
+        );
     }
 
     @Override

@@ -28,6 +28,7 @@ class WebSocketDeliveryPayloadConverterTest {
         PrivateMessageResponse response = new PrivateMessageResponse(
             messageId,
             senderId,
+            "+49111111111",
             recipientId,
             "hello",
             sentAt

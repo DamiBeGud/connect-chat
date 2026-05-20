@@ -13,4 +13,6 @@ public interface UserService {
     User verifyRegistration(RegisterVerificationRequest request);
 
     User getUserById(UUID userId);
+
+    User getUserByPhoneNumber(String phoneNumber);
 }

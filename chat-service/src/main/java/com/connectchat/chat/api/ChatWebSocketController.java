@@ -28,9 +28,9 @@ public class ChatWebSocketController {
         UUID senderId = UUID.fromString(principal.getName());
 
         log.info(
-            "Received private chat message senderId={} recipientId={} contentLength={}",
+            "Received private chat message senderId={} recipientPhoneNumber={} contentLength={}",
             senderId,
-            request.recipientId(),
+            request.recipientPhoneNumber(),
             request.content().length()
         );
 

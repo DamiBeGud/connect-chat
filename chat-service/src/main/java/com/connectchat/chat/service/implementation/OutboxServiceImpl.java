@@ -1,6 +1,5 @@
 package com.connectchat.chat.service.implementation;
 
-import com.connectchat.chat.api.request.PrivateMessageRequest;
 import com.connectchat.chat.entity.OutboxMessage;
 import com.connectchat.chat.repository.OutboxMessageRepository;
 import com.connectchat.chat.service.OutboxService;
@@ -19,12 +18,16 @@ public class OutboxServiceImpl implements OutboxService {
 
     @Override
     @Transactional
-    public void enqueuePrivateMessage(UUID senderId, PrivateMessageRequest request) {
+    public void enqueuePrivateMessage(
+        UUID senderId,
+        UUID recipientId,
+        String content
+    ) {
         outboxMessageRepository.save(
             OutboxMessage.builder()
                 .senderId(senderId)
-                .recipientId(request.recipientId())
-                .content(request.content())
+                .recipientId(recipientId)
+                .content(content)
                 .build()
         );
     }

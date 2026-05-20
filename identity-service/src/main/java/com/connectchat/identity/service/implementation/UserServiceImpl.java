@@ -87,4 +87,12 @@ public class UserServiceImpl implements UserService {
             .findById(userId)
             .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public User getUserByPhoneNumber(String phoneNumber) {
+        return userRepository
+            .findByPhoneNumber(phoneNumber)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    }
 }

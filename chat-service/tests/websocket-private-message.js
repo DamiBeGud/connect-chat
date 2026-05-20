@@ -1,7 +1,7 @@
 const crypto = require("node:crypto");
 
 const token = createJwt("143b4676-3693-4186-af84-5dfeb9692b7c");
-const recipientId = "ac9b3a0a-bedb-45bc-975c-9a3b83a6ca09";
+const recipientPhoneNumber = "+49123456789";
 const ws = new WebSocket("ws://localhost:8083/ws/chat");
 
 ws.onopen = () => {
@@ -36,7 +36,7 @@ ws.onmessage = (event) => {
         "destination:/app/chat.private\n" +
         "content-type:application/json\n\n" +
         JSON.stringify({
-          recipientId,
+          recipientPhoneNumber,
           content: "Hello from simple websocket testdsa",
         }) +
         "\u0000",

@@ -4,6 +4,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.connectchat.chat.api.request.PrivateMessageRequest;
+import com.connectchat.chat.client.IdentityUserClient;
+import com.connectchat.chat.client.response.IdentityUserResponse;
 import com.connectchat.chat.common.messaging.PrivateMessageStatus;
 import com.connectchat.chat.entity.OutboxMessage;
 import com.connectchat.chat.service.MessageStatusOutboxService;
@@ -18,10 +20,14 @@ class ChatApplicationServiceImplTest {
     );
     private final MessageStatusOutboxService messageStatusOutboxService =
         org.mockito.Mockito.mock(MessageStatusOutboxService.class);
+    private final IdentityUserClient identityUserClient = org.mockito.Mockito.mock(
+        IdentityUserClient.class
+    );
     private final ChatApplicationServiceImpl service =
         new ChatApplicationServiceImpl(
             outboxService,
-            messageStatusOutboxService
+            messageStatusOutboxService,
+            identityUserClient
         );
 
     @Test
@@ -29,13 +35,16 @@ class ChatApplicationServiceImplTest {
         UUID senderId = UUID.randomUUID();
         UUID recipientId = UUID.randomUUID();
         PrivateMessageRequest request = new PrivateMessageRequest(
-            recipientId,
+            "+49123456789",
             "hello"
+        );
+        when(identityUserClient.getUserByPhoneNumber("+49123456789")).thenReturn(
+            new IdentityUserResponse(recipientId, "+49123456789")
         );
 
         service.handlePrivateMessage(senderId, request);
 
-        verify(outboxService).enqueuePrivateMessage(senderId, request);
+        verify(outboxService).enqueuePrivateMessage(senderId, recipientId, "hello");
     }
 
     @Test

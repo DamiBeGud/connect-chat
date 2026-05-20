@@ -61,6 +61,7 @@ class WebSocketDeliveryFanoutServiceTest {
         PrivateMessageResponse response = new PrivateMessageResponse(
             messageId,
             senderId,
+            "+49111111111",
             recipientId,
             "hello",
             Instant.now(clock)
@@ -105,6 +106,7 @@ class WebSocketDeliveryFanoutServiceTest {
         PrivateMessageResponse response = new PrivateMessageResponse(
             messageId,
             userId,
+            "+49111111111",
             userId,
             "note to self",
             Instant.now(clock)

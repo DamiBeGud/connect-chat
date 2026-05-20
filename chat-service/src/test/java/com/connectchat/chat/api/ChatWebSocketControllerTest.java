@@ -21,9 +21,8 @@ class ChatWebSocketControllerTest {
     @Test
     void sendsPrivateMessageAsAuthenticatedUser() {
         UUID senderId = UUID.randomUUID();
-        UUID recipientId = UUID.randomUUID();
         PrivateMessageRequest request = new PrivateMessageRequest(
-            recipientId,
+            "+49123456789",
             "hello"
         );
         Principal principal = senderId::toString;

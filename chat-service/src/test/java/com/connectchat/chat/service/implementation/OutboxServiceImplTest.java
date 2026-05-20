@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.connectchat.chat.api.request.PrivateMessageRequest;
 import com.connectchat.chat.entity.MessageProcessingStatus;
 import com.connectchat.chat.entity.OutboxMessage;
 import com.connectchat.chat.repository.OutboxMessageRepository;
@@ -24,12 +23,8 @@ class OutboxServiceImplTest {
     void enqueuesPendingOutboxMessage() {
         UUID senderId = UUID.randomUUID();
         UUID recipientId = UUID.randomUUID();
-        PrivateMessageRequest request = new PrivateMessageRequest(
-            recipientId,
-            "hello"
-        );
 
-        service.enqueuePrivateMessage(senderId, request);
+        service.enqueuePrivateMessage(senderId, recipientId, "hello");
 
         verify(repository).save(
             any(OutboxMessage.class)
