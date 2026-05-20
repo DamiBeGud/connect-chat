@@ -51,13 +51,14 @@ metadata:
   name: identity-service
   namespace: connect-chat
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app.kubernetes.io/name: identity-service
   ports:
     - name: http
       port: 8081
       targetPort: http
+      nodePort: 30081
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -173,13 +174,14 @@ metadata:
   name: group-service
   namespace: connect-chat
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app.kubernetes.io/name: group-service
   ports:
     - name: http
       port: 8082
       targetPort: http
+      nodePort: 30082
 ---
 apiVersion: apps/v1
 kind: Deployment

@@ -2,15 +2,55 @@
 
 This document describes the current REST and WebSocket APIs for building a mobile client.
 
-Local service URLs:
+Client-facing service URLs depend on the environment.
 
-| Service | Local URL |
+For native k3s on `dev0` using direct Kubernetes `NodePort`s:
+
+| Service | URL |
+| --- | --- |
+| Identity Service | `http://dev0:30081` |
+| Group Service | `http://dev0:30082` |
+| Chat Service WebSocket | `ws://dev0:30083/ws/chat` |
+
+For native k3s on `dev0` with the optional Nginx reverse proxy from `.docs/dev0-linux-k3s-setup.md`:
+
+| Service | URL |
+| --- | --- |
+| Identity Service | `http://dev0:8081` |
+| Group Service | `http://dev0:8082` |
+| Chat Service WebSocket | `ws://dev0:8083/ws/chat` |
+
+For local machine development with Docker Compose services or k3d port mappings:
+
+| Service | URL |
 | --- | --- |
 | Identity Service | `http://localhost:8081` |
 | Group Service | `http://localhost:8082` |
 | Chat Service WebSocket | `ws://localhost:8083/ws/chat` |
-| Message Storage Service | `http://localhost:8084` |
-| Presence Service | `http://localhost:8085` |
+| Message Storage Service | `http://localhost:8084` if running locally or port-forwarded |
+| Presence Service | `http://localhost:8085` if running locally or port-forwarded |
+
+Examples in this document use variables so the same commands work in each environment:
+
+```bash
+# Native k3s on dev0, direct NodePorts
+export IDENTITY_BASE_URL="http://dev0:30081"
+export GROUP_BASE_URL="http://dev0:30082"
+export CHAT_HTTP_BASE_URL="http://dev0:30083"
+export CHAT_WS_URL="ws://dev0:30083/ws/chat"
+
+# Native k3s on dev0, optional Nginx proxy
+# export IDENTITY_BASE_URL="http://dev0:8081"
+# export GROUP_BASE_URL="http://dev0:8082"
+# export CHAT_HTTP_BASE_URL="http://dev0:8083"
+# export CHAT_WS_URL="ws://dev0:8083/ws/chat"
+
+# Local development
+# export IDENTITY_BASE_URL="http://localhost:8081"
+# export GROUP_BASE_URL="http://localhost:8082"
+# export CHAT_HTTP_BASE_URL="http://localhost:8083"
+# export CHAT_WS_URL="ws://localhost:8083/ws/chat"
+```
 
 ## Common Conventions
 
@@ -68,7 +108,7 @@ Mobile clients should use only user access tokens. Internal service tokens are f
 Base URL:
 
 ```text
-http://localhost:8081/api/v1/identity
+$IDENTITY_BASE_URL/api/v1/identity
 ```
 
 ### Register
@@ -120,7 +160,7 @@ Response:
 Example:
 
 ```bash
-curl -X POST "http://localhost:8081/api/v1/identity/auth/register" \
+curl -X POST "$IDENTITY_BASE_URL/api/v1/identity/auth/register" \
   -H "Content-Type: application/json" \
   -d '{
     "phoneNumber": "+15551234567",
@@ -176,7 +216,7 @@ Response:
 Example:
 
 ```bash
-curl -X POST "http://localhost:8081/api/v1/identity/auth/register/verify" \
+curl -X POST "$IDENTITY_BASE_URL/api/v1/identity/auth/register/verify" \
   -H "Content-Type: application/json" \
   -d '{
     "phoneNumber": "+15551234567",
@@ -305,7 +345,7 @@ Returns `200 OK` with empty body.
 Base URL:
 
 ```text
-http://localhost:8082/api/v1/groups
+$GROUP_BASE_URL/api/v1/groups
 ```
 
 All group APIs require a user access token unless explicitly called by an internal service.
@@ -353,7 +393,7 @@ Response:
 Example:
 
 ```bash
-curl -X POST "http://localhost:8082/api/v1/groups" \
+curl -X POST "$GROUP_BASE_URL/api/v1/groups" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{ "name": "Best Friends" }'
@@ -481,7 +521,7 @@ Chat uses raw WebSocket with STOMP.
 Endpoint:
 
 ```text
-ws://localhost:8083/ws/chat
+$CHAT_WS_URL
 ```
 
 STOMP app destination prefix:
@@ -628,9 +668,11 @@ This is a minimal browser-compatible example. Mobile clients should use the equi
 import { Client } from "@stomp/stompjs";
 
 const accessToken = "user-access-token";
+// Use the same value as CHAT_WS_URL for your environment.
+const chatWsUrl = "ws://dev0:30083/ws/chat";
 
 const client = new Client({
-  brokerURL: "ws://localhost:8083/ws/chat",
+  brokerURL: chatWsUrl,
   connectHeaders: {
     Authorization: `Bearer ${accessToken}`,
   },
@@ -676,6 +718,18 @@ function markRead(messageId) {
 Presence-service is internal only. Mobile clients should not call it directly. Chat-service calls it with an internal service token.
 
 Base URL:
+
+```text
+http://presence-service:8085/api/v1/presence
+```
+
+When debugging from outside the cluster, port-forward it first:
+
+```bash
+kubectl -n connect-chat port-forward svc/presence-service 8085:8085
+```
+
+Then use:
 
 ```text
 http://localhost:8085/api/v1/presence
@@ -877,9 +931,26 @@ GET /actuator/health
 Examples:
 
 ```bash
-curl "http://localhost:8081/actuator/health"
-curl "http://localhost:8082/actuator/health"
-curl "http://localhost:8083/actuator/health"
+curl "$IDENTITY_BASE_URL/actuator/health"
+curl "$GROUP_BASE_URL/actuator/health"
+```
+
+For chat health:
+
+```bash
+curl "$CHAT_HTTP_BASE_URL/actuator/health"
+```
+
+For internal services, port-forward before checking health:
+
+```bash
+kubectl -n connect-chat port-forward svc/message-storage-service 8084:8084
+kubectl -n connect-chat port-forward svc/presence-service 8085:8085
+```
+
+Then, in separate terminals:
+
+```bash
 curl "http://localhost:8084/actuator/health"
 curl "http://localhost:8085/actuator/health"
 ```

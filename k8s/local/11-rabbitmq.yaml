@@ -54,7 +54,9 @@ spec:
                 - -q
                 - check_running
             initialDelaySeconds: 20
+            timeoutSeconds: 10
             periodSeconds: 10
+            failureThreshold: 10
           livenessProbe:
             exec:
               command:
@@ -62,7 +64,9 @@ spec:
                 - -q
                 - ping
             initialDelaySeconds: 60
+            timeoutSeconds: 10
             periodSeconds: 20
+            failureThreshold: 10
           volumeMounts:
             - name: rabbitmq-data
               mountPath: /var/lib/rabbitmq
@@ -87,4 +91,3 @@ spec:
     - name: management
       port: 15672
       targetPort: management
-

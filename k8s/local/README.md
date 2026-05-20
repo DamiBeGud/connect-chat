@@ -7,11 +7,14 @@ These manifests run the app services and local development infrastructure inside
 On macOS, use k3d because native k3s is Linux-only:
 
 ```bash
-k3d cluster create connect-chat -p "8083:30083@loadbalancer"
+k3d cluster create connect-chat \
+  -p "8081:30081@loadbalancer" \
+  -p "8082:30082@loadbalancer" \
+  -p "8083:30083@loadbalancer"
 kubectl config use-context k3d-connect-chat
 ```
 
-The chat service runs with `3` replicas. The `8083:30083` port mapping exposes the chat `NodePort` through k3d so new WebSocket connections to `localhost:8083` are distributed across chat pods by Kubernetes.
+The identity, group, and chat services are exposed through stable local k3d port mappings. The `8083:30083` port mapping exposes the chat `NodePort` through k3d so new WebSocket connections to `localhost:8083` are distributed across chat pods by Kubernetes.
 
 ## 2. Build and import service images
 
@@ -59,14 +62,14 @@ kubectl -n connect-chat rollout status deploy/message-storage-service --timeout=
 Use the k3d port mapping for chat:
 
 ```bash
+http://localhost:8081
+http://localhost:8082
 ws://localhost:8083/ws/chat
 ```
 
 Run port-forward commands in separate terminals for the remaining services:
 
 ```bash
-kubectl -n connect-chat port-forward svc/identity-service 8081:8081
-kubectl -n connect-chat port-forward svc/group-service 8082:8082
 kubectl -n connect-chat port-forward svc/message-storage-service 8084:8084
 kubectl -n connect-chat port-forward svc/presence-service 8085:8085
 ```
