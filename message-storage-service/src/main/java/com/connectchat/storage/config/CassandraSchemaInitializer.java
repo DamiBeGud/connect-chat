@@ -21,5 +21,19 @@ public class CassandraSchemaInitializer {
             )
             """
         );
+        cqlSession.execute(
+            """
+            CREATE TABLE IF NOT EXISTS undelivered_messages_by_recipient (
+                recipient_id uuid,
+                sent_at timestamp,
+                message_id uuid,
+                sender_id uuid,
+                content text,
+                status text,
+                updated_at timestamp,
+                PRIMARY KEY ((recipient_id), sent_at, message_id)
+            ) WITH CLUSTERING ORDER BY (sent_at ASC, message_id ASC)
+            """
+        );
     }
 }

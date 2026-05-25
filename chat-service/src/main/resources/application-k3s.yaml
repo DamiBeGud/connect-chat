@@ -23,3 +23,11 @@ spring:
 identity:
   service:
     base-url: ${IDENTITY_SERVICE_BASE_URL:http://identity-service:8081}
+
+presence:
+  service:
+    base-url: ${PRESENCE_SERVICE_BASE_URL:http://presence-service:8085}
+
+message-storage:
+  service:
+    base-url: ${MESSAGE_STORAGE_SERVICE_BASE_URL:http://message-storage-service:8084}

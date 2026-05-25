@@ -4,5 +4,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableConfigurationProperties(WebSocketDeliveryProperties.class)
+@EnableConfigurationProperties(
+    { WebSocketDeliveryProperties.class, OfflineMessageDeliveryProperties.class }
+)
 public class WebSocketDeliveryConfiguration {}

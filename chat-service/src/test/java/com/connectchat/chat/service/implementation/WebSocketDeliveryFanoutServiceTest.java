@@ -124,6 +124,42 @@ class WebSocketDeliveryFanoutServiceTest {
         assertThat(tasks.getFirst().getTargetSessionId()).isEqualTo("same-session");
     }
 
+    @Test
+    void createsPrivateMessageTaskForSpecificSession() {
+        UUID senderId = UUID.randomUUID();
+        UUID recipientId = UUID.randomUUID();
+        UUID messageId = UUID.randomUUID();
+        PrivateMessageResponse response = new PrivateMessageResponse(
+            messageId,
+            senderId,
+            "+49111111111",
+            recipientId,
+            "missed",
+            Instant.now(clock)
+        );
+        when(payloadConverter.serialize(response)).thenReturn("{\"missed\":true}");
+
+        service.createPrivateMessageTaskForSession(
+            response,
+            "recipient-session",
+            "chat:local"
+        );
+
+        List<WebSocketDeliveryTask> tasks = capturedTasks();
+        assertThat(tasks).hasSize(1);
+        WebSocketDeliveryTask task = tasks.getFirst();
+        assertThat(task.getSourceEventId()).isEqualTo(messageId);
+        assertThat(task.getType()).isEqualTo(WebSocketDeliveryTaskType.PRIVATE_MESSAGE);
+        assertThat(task.getTargetUserId()).isEqualTo(recipientId);
+        assertThat(task.getTargetSessionId()).isEqualTo("recipient-session");
+        assertThat(task.getTargetInstanceId()).isEqualTo("chat:local");
+        assertThat(task.getDestination())
+            .isEqualTo(WebSocketDeliveryFanoutService.PRIVATE_MESSAGES_DESTINATION);
+        assertThat(task.getPayload()).isEqualTo("{\"missed\":true}");
+        assertThat(task.getExpiresAt())
+            .isEqualTo(Instant.parse("2026-05-06T10:20:30Z"));
+    }
+
     @SuppressWarnings("unchecked")
     private List<WebSocketDeliveryTask> capturedTasks() {
         ArgumentCaptor<Collection<WebSocketDeliveryTask>> captor =

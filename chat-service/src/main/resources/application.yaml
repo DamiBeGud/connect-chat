@@ -30,10 +30,17 @@ chat:
     task-ttl: ${CHAT_WEBSOCKET_DELIVERY_TASK_TTL:5m}
     stale-processing-timeout: ${CHAT_WEBSOCKET_DELIVERY_STALE_PROCESSING_TIMEOUT:30s}
     cleanup-delay: ${CHAT_WEBSOCKET_DELIVERY_CLEANUP_DELAY:5000}
+  offline-delivery:
+    batch-size: ${CHAT_OFFLINE_DELIVERY_BATCH_SIZE:50}
+    retry-delay: ${CHAT_OFFLINE_DELIVERY_RETRY_DELAY:3s}
 
 presence:
   service:
     base-url: ${PRESENCE_SERVICE_BASE_URL:http://localhost:8085}
+
+message-storage:
+  service:
+    base-url: ${MESSAGE_STORAGE_SERVICE_BASE_URL:http://localhost:8084}
 
 identity:
   service:

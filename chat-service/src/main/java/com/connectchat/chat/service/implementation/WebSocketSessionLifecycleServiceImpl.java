@@ -3,6 +3,7 @@ package com.connectchat.chat.service.implementation;
 import com.connectchat.chat.client.PresenceClient;
 import com.connectchat.chat.config.ChatInstanceInfo;
 import com.connectchat.chat.service.LocalSessionRegistry;
+import com.connectchat.chat.service.OfflineMessageDeliveryService;
 import com.connectchat.chat.service.WebSocketSessionLifecycleService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ public class WebSocketSessionLifecycleServiceImpl
     private final LocalSessionRegistry localSessionRegistry;
     private final PresenceClient presenceClient;
     private final ChatInstanceInfo chatInstanceInfo;
+    private final OfflineMessageDeliveryService offlineMessageDeliveryService;
 
     @Override
     public void registerSession(UUID userId, String sessionId) {
@@ -35,6 +37,28 @@ public class WebSocketSessionLifecycleServiceImpl
                 userId,
                 sessionId,
                 chatInstanceInfo.getInstanceId(),
+                exception
+            );
+        }
+
+        try {
+            offlineMessageDeliveryService.deliverPendingMessages(userId, sessionId);
+        } catch (RuntimeException exception) {
+            log.warn(
+                "Failed to deliver offline messages userId={} sessionId={}",
+                userId,
+                sessionId,
+                exception
+            );
+        }
+
+        try {
+            offlineMessageDeliveryService.scheduleDelayedDelivery(userId, sessionId);
+        } catch (RuntimeException exception) {
+            log.warn(
+                "Failed to schedule delayed offline message delivery userId={} sessionId={}",
+                userId,
+                sessionId,
                 exception
             );
         }

@@ -45,6 +45,26 @@ public class WebSocketDeliveryFanoutService {
         );
     }
 
+    public int createPrivateMessageTaskForSession(
+        PrivateMessageResponse response,
+        String sessionId,
+        String instanceId
+    ) {
+        Instant expiresAt = Instant.now(clock).plus(properties.taskTtl());
+        WebSocketDeliveryTask task = WebSocketDeliveryTask.builder()
+            .sourceEventId(response.messageId())
+            .type(WebSocketDeliveryTaskType.PRIVATE_MESSAGE)
+            .targetUserId(response.recipientId())
+            .targetSessionId(sessionId)
+            .targetInstanceId(instanceId)
+            .destination(PRIVATE_MESSAGES_DESTINATION)
+            .payload(payloadConverter.serialize(response))
+            .expiresAt(expiresAt)
+            .build();
+
+        return deliveryTaskService.createTasks(List.of(task));
+    }
+
     public int createPrivateMessageStatusTasks(
         UUID sourceEventId,
         PrivateMessageStatusResponse response
