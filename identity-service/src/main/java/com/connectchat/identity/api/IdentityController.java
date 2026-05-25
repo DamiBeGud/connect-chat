@@ -162,7 +162,13 @@ public class IdentityController {
     }
 
     private IdentityUserResponse toResponse(User user) {
-        return new IdentityUserResponse(user.getId(), user.getPhoneNumber());
+        return new IdentityUserResponse(
+            user.getId(),
+            user.getPhoneNumber(),
+            user.getFirstName(),
+            user.getLastName(),
+            user.getNickname()
+        );
     }
 
     private void requireInternalService(Jwt jwt) {

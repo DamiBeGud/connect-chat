@@ -351,7 +351,10 @@ Response:
   },
   "data": {
     "userId": "793de6b4-7ced-4a80-80c7-dd22d9b90a72",
-    "phoneNumber": "+15551234567"
+    "phoneNumber": "+15551234567",
+    "firstName": "Dami",
+    "lastName": "Begud",
+    "nickname": "dami"
   },
   "error": null
 }
@@ -376,7 +379,10 @@ Response:
   },
   "data": {
     "userId": "ac9b3a0a-bedb-45bc-975c-9a3b83a6ca09",
-    "phoneNumber": "+15557654321"
+    "phoneNumber": "+15557654321",
+    "firstName": "Alex",
+    "lastName": "Rivera",
+    "nickname": null
   },
   "error": null
 }
@@ -480,6 +486,7 @@ Response:
   "data": {
     "groupId": "9d46599f-27cb-4d2b-8d3b-4fffce6773d3",
     "userId": "ac9b3a0a-bedb-45bc-975c-9a3b83a6ca09",
+    "displayName": "Alex Rivera",
     "role": "MEMBER",
     "joinedAt": "2026-05-19T13:25:19.952135Z"
   },
@@ -540,6 +547,8 @@ GET /api/v1/groups/{groupId}/members
 Authorization: Bearer <user-access-token>
 ```
 
+Each member includes `displayName`. Group-service uses the user's `nickname` when present; otherwise it falls back to `firstName` + `lastName`.
+
 Response:
 
 ```json
@@ -552,12 +561,14 @@ Response:
     {
       "groupId": "9d46599f-27cb-4d2b-8d3b-4fffce6773d3",
       "userId": "793de6b4-7ced-4a80-80c7-dd22d9b90a72",
+      "displayName": "dami",
       "role": "OWNER",
       "joinedAt": "2026-05-19T13:25:19.952135Z"
     },
     {
       "groupId": "9d46599f-27cb-4d2b-8d3b-4fffce6773d3",
       "userId": "ac9b3a0a-bedb-45bc-975c-9a3b83a6ca09",
+      "displayName": "Alex Rivera",
       "role": "MEMBER",
       "joinedAt": "2026-05-19T13:26:00.000000Z"
     }

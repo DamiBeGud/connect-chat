@@ -2,4 +2,10 @@ package com.connectchat.identity.api.response;
 
 import java.util.UUID;
 
-public record IdentityUserResponse(UUID userId, String phoneNumber) {}
+public record IdentityUserResponse(
+    UUID userId,
+    String phoneNumber,
+    String firstName,
+    String lastName,
+    String nickname
+) {}

@@ -7,6 +7,7 @@ import java.util.UUID;
 public record GroupMemberResponse(
     UUID groupId,
     UUID userId,
+    String displayName,
     GroupMemberRole role,
     Instant joinedAt
 ) {}

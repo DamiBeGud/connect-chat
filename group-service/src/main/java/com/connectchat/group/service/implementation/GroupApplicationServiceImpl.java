@@ -22,6 +22,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -91,7 +92,7 @@ public class GroupApplicationServiceImpl implements GroupApplicationService {
                 .build()
         );
 
-        return toMemberResponse(member);
+        return toMemberResponse(member, user);
     }
 
     @Override
@@ -170,11 +171,37 @@ public class GroupApplicationServiceImpl implements GroupApplicationService {
     }
 
     private GroupMemberResponse toMemberResponse(GroupMember member) {
+        return toMemberResponse(
+            member,
+            identityUserClient.getUserById(member.getUserId())
+        );
+    }
+
+    private GroupMemberResponse toMemberResponse(
+        GroupMember member,
+        IdentityUserResponse user
+    ) {
         return new GroupMemberResponse(
             member.getGroupId(),
             member.getUserId(),
+            displayName(user),
             member.getRole(),
             member.getCreatedAt()
         );
+    }
+
+    private String displayName(IdentityUserResponse user) {
+        if (StringUtils.hasText(user.nickname())) {
+            return user.nickname();
+        }
+
+        String fullName = List.of(user.firstName(), user.lastName())
+            .stream()
+            .filter(StringUtils::hasText)
+            .map(String::trim)
+            .reduce((first, second) -> first + " " + second)
+            .orElse("");
+
+        return StringUtils.hasText(fullName) ? fullName : user.phoneNumber();
     }
 }
