@@ -1,6 +1,8 @@
 package com.connectchat.group.api.request;
 
-import jakarta.validation.constraints.NotNull;
-import java.util.UUID;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
-public record AddGroupMemberRequest(@NotNull UUID userId) {}
+public record AddGroupMemberRequest(
+    @NotBlank @Pattern(regexp = "^\\+[1-9]\\d{1,14}$") String phoneNumber
+) {}

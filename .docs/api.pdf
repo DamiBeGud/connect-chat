@@ -1,0 +1,855 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [7 0 R 9 0 R 11 0 R 13 0 R 15 0 R 17 0 R 19 0 R 21 0 R 23 0 R 25 0 R 27 0 R 29 0 R 31 0 R 33 0 R 35 0 R 37 0 R 39 0 R] /Count 17 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
+endobj
+6 0 obj
+<< /Length 3543 >>
+stream
+BT /F2 20 Tf 46.00 791.00 Td (Connect Chat API Documentation) Tj ET
+BT /F1 10.5 Tf 46.00 749.00 Td (This document describes the current REST and WebSocket APIs for building a mobile client.) Tj ET
+BT /F1 10.5 Tf 46.00 725.00 Td (Client-facing service URLs depend on the environment.) Tj ET
+BT /F1 10.5 Tf 46.00 701.00 Td (For native k3s on dev0 using direct Kubernetes NodePorts:) Tj ET
+BT /F3 8.5 Tf 46.00 677.00 Td (Service | URL) Tj ET
+BT /F3 8.5 Tf 46.00 665.00 Td (Identity Service | http://dev0:30081) Tj ET
+BT /F3 8.5 Tf 46.00 653.00 Td (Group Service | http://dev0:30082) Tj ET
+BT /F3 8.5 Tf 46.00 641.00 Td (Chat Service WebSocket | ws://dev0:30083/ws/chat) Tj ET
+BT /F1 10.5 Tf 46.00 620.00 Td (For native k3s on dev0 with the optional Nginx reverse proxy from) Tj ET
+BT /F1 10.5 Tf 46.00 605.00 Td (.docs/dev0-linux-k3s-setup.md:) Tj ET
+BT /F3 8.5 Tf 46.00 581.00 Td (Service | URL) Tj ET
+BT /F3 8.5 Tf 46.00 569.00 Td (Identity Service | http://dev0:8081) Tj ET
+BT /F3 8.5 Tf 46.00 557.00 Td (Group Service | http://dev0:8082) Tj ET
+BT /F3 8.5 Tf 46.00 545.00 Td (Chat Service WebSocket | ws://dev0:8083/ws/chat) Tj ET
+BT /F1 10.5 Tf 46.00 524.00 Td (For local machine development with Docker Compose services or k3d port mappings:) Tj ET
+BT /F3 8.5 Tf 46.00 500.00 Td (Service | URL) Tj ET
+BT /F3 8.5 Tf 46.00 488.00 Td (Identity Service | http://localhost:8081) Tj ET
+BT /F3 8.5 Tf 46.00 476.00 Td (Group Service | http://localhost:8082) Tj ET
+BT /F3 8.5 Tf 46.00 464.00 Td (Chat Service WebSocket | ws://localhost:8083/ws/chat) Tj ET
+BT /F3 8.5 Tf 46.00 452.00 Td (Message Storage Service | http://localhost:8084 if running locally or port-forwarded) Tj ET
+BT /F3 8.5 Tf 46.00 440.00 Td (Presence Service | http://localhost:8085 if running locally or port-forwarded) Tj ET
+BT /F1 10.5 Tf 46.00 419.00 Td (Examples in this document use variables so the same commands work in each environment:) Tj ET
+BT /F3 8.5 Tf 46.00 386.00 Td (# Native k3s on dev0, direct NodePorts) Tj ET
+BT /F3 8.5 Tf 46.00 374.00 Td (export IDENTITY_BASE_URL="http://dev0:30081") Tj ET
+BT /F3 8.5 Tf 46.00 362.00 Td (export GROUP_BASE_URL="http://dev0:30082") Tj ET
+BT /F3 8.5 Tf 46.00 350.00 Td (export CHAT_HTTP_BASE_URL="http://dev0:30083") Tj ET
+BT /F3 8.5 Tf 46.00 338.00 Td (export CHAT_WS_URL="ws://dev0:30083/ws/chat") Tj ET
+BT /F3 8.5 Tf 46.00 326.00 Td () Tj ET
+BT /F3 8.5 Tf 46.00 314.00 Td (# Native k3s on dev0, optional Nginx proxy) Tj ET
+BT /F3 8.5 Tf 46.00 302.00 Td (# export IDENTITY_BASE_URL="http://dev0:8081") Tj ET
+BT /F3 8.5 Tf 46.00 290.00 Td (# export GROUP_BASE_URL="http://dev0:8082") Tj ET
+BT /F3 8.5 Tf 46.00 278.00 Td (# export CHAT_HTTP_BASE_URL="http://dev0:8083") Tj ET
+BT /F3 8.5 Tf 46.00 266.00 Td (# export CHAT_WS_URL="ws://dev0:8083/ws/chat") Tj ET
+BT /F3 8.5 Tf 46.00 254.00 Td () Tj ET
+BT /F3 8.5 Tf 46.00 242.00 Td (# Local development) Tj ET
+BT /F3 8.5 Tf 46.00 230.00 Td (# export IDENTITY_BASE_URL="http://localhost:8081") Tj ET
+BT /F3 8.5 Tf 46.00 218.00 Td (# export GROUP_BASE_URL="http://localhost:8082") Tj ET
+BT /F3 8.5 Tf 46.00 206.00 Td (# export CHAT_HTTP_BASE_URL="http://localhost:8083") Tj ET
+BT /F3 8.5 Tf 46.00 194.00 Td (# export CHAT_WS_URL="ws://localhost:8083/ws/chat") Tj ET
+BT /F2 16 Tf 46.00 159.00 Td (Common Conventions) Tj ET
+BT /F1 10.5 Tf 46.00 122.00 Td (All REST services that return JSON use this envelope:) Tj ET
+BT /F3 8.5 Tf 46.00 89.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 77.00 Td (  "metadata": {) Tj ET
+BT /F3 8.5 Tf 46.00 65.00 Td (    "requestId": "request/session id",) Tj ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 6 0 R >>
+endobj
+8 0 obj
+<< /Length 2410 >>
+stream
+BT /F3 8.5 Tf 46.00 796.00 Td (    "timestamp": "2026-05-19T13:25:19.952135Z",) Tj ET
+BT /F3 8.5 Tf 46.00 784.00 Td (    "status": 200,) Tj ET
+BT /F3 8.5 Tf 46.00 772.00 Td (    "message": "Human-readable result") Tj ET
+BT /F3 8.5 Tf 46.00 760.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 748.00 Td (  "data": {},) Tj ET
+BT /F3 8.5 Tf 46.00 736.00 Td (  "error": null) Tj ET
+BT /F3 8.5 Tf 46.00 724.00 Td (}) Tj ET
+BT /F1 10.5 Tf 46.00 694.00 Td (Error response shape:) Tj ET
+BT /F3 8.5 Tf 46.00 661.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 649.00 Td (  "metadata": {) Tj ET
+BT /F3 8.5 Tf 46.00 637.00 Td (    "requestId": "request/session id",) Tj ET
+BT /F3 8.5 Tf 46.00 625.00 Td (    "timestamp": "2026-05-19T13:25:19.952135Z",) Tj ET
+BT /F3 8.5 Tf 46.00 613.00 Td (    "status": 400,) Tj ET
+BT /F3 8.5 Tf 46.00 601.00 Td (    "message": "Bad Request") Tj ET
+BT /F3 8.5 Tf 46.00 589.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 577.00 Td (  "data": null,) Tj ET
+BT /F3 8.5 Tf 46.00 565.00 Td (  "error": {) Tj ET
+BT /F3 8.5 Tf 46.00 553.00 Td (    "code": "VALIDATION_ERROR",) Tj ET
+BT /F3 8.5 Tf 46.00 541.00 Td (    "message": "Request validation failed") Tj ET
+BT /F3 8.5 Tf 46.00 529.00 Td (  }) Tj ET
+BT /F3 8.5 Tf 46.00 517.00 Td (}) Tj ET
+BT /F1 10.5 Tf 46.00 487.00 Td (Use ISO-8601 timestamps. UUID fields are strings. Phone numbers use E.164 format, for example) Tj ET
+BT /F1 10.5 Tf 46.00 472.00 Td (+15551234567.) Tj ET
+BT /F1 10.5 Tf 46.00 448.00 Td (Authenticated user APIs require:) Tj ET
+BT /F3 8.5 Tf 46.00 415.00 Td (Authorization: Bearer <user-access-token>) Tj ET
+BT /F1 10.5 Tf 46.00 385.00 Td (Internal APIs require:) Tj ET
+BT /F3 8.5 Tf 46.00 352.00 Td (Authorization: Bearer <internal-service-token>) Tj ET
+BT /F1 10.5 Tf 46.00 322.00 Td (Mobile clients should use only user access tokens. Internal service tokens are for backend) Tj ET
+BT /F1 10.5 Tf 46.00 307.00 Td (services only.) Tj ET
+BT /F2 16 Tf 46.00 278.00 Td (Identity Service) Tj ET
+BT /F1 10.5 Tf 46.00 241.00 Td (Base URL:) Tj ET
+BT /F3 8.5 Tf 46.00 208.00 Td ($IDENTITY_BASE_URL/api/v1/identity) Tj ET
+BT /F2 13 Tf 46.00 173.00 Td (Register) Tj ET
+BT /F1 10.5 Tf 46.00 145.00 Td (Starts registration and sends a verification code by SMS.) Tj ET
+BT /F3 8.5 Tf 46.00 112.00 Td (POST /api/v1/identity/auth/register) Tj ET
+BT /F3 8.5 Tf 46.00 100.00 Td (Content-Type: application/json) Tj ET
+BT /F1 10.5 Tf 46.00 70.00 Td (Request:) Tj ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 8 0 R >>
+endobj
+10 0 obj
+<< /Length 2784 >>
+stream
+BT /F3 8.5 Tf 46.00 796.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 784.00 Td (  "phoneNumber": "+15551234567",) Tj ET
+BT /F3 8.5 Tf 46.00 772.00 Td (  "firstName": "Dami",) Tj ET
+BT /F3 8.5 Tf 46.00 760.00 Td (  "lastName": "Begud",) Tj ET
+BT /F3 8.5 Tf 46.00 748.00 Td (  "nickname": "dami",) Tj ET
+BT /F3 8.5 Tf 46.00 736.00 Td (  "dateOfBirth": "1995-04-20",) Tj ET
+BT /F3 8.5 Tf 46.00 724.00 Td (  "country": "US") Tj ET
+BT /F3 8.5 Tf 46.00 712.00 Td (}) Tj ET
+BT /F1 10.5 Tf 46.00 682.00 Td (Validation:) Tj ET
+BT /F3 8.5 Tf 46.00 658.00 Td (Field | Required | Rule) Tj ET
+BT /F3 8.5 Tf 46.00 646.00 Td (phoneNumber | yes | E.164 format, example +15551234567) Tj ET
+BT /F3 8.5 Tf 46.00 634.00 Td (firstName | yes | max 100 chars) Tj ET
+BT /F3 8.5 Tf 46.00 622.00 Td (lastName | yes | max 100 chars) Tj ET
+BT /F3 8.5 Tf 46.00 610.00 Td (nickname | no | max 100 chars) Tj ET
+BT /F3 8.5 Tf 46.00 598.00 Td (dateOfBirth | yes | date in the past, format YYYY-MM-DD) Tj ET
+BT /F3 8.5 Tf 46.00 586.00 Td (country | yes | max 100 chars) Tj ET
+BT /F1 10.5 Tf 46.00 565.00 Td (Response:) Tj ET
+BT /F3 8.5 Tf 46.00 532.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 520.00 Td (  "metadata": {) Tj ET
+BT /F3 8.5 Tf 46.00 508.00 Td (    "status": 200,) Tj ET
+BT /F3 8.5 Tf 46.00 496.00 Td (    "message": "Registration verification code sent") Tj ET
+BT /F3 8.5 Tf 46.00 484.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 472.00 Td (  "data": null,) Tj ET
+BT /F3 8.5 Tf 46.00 460.00 Td (  "error": null) Tj ET
+BT /F3 8.5 Tf 46.00 448.00 Td (}) Tj ET
+BT /F1 10.5 Tf 46.00 418.00 Td (Example:) Tj ET
+BT /F3 8.5 Tf 46.00 385.00 Td (curl -X POST "$IDENTITY_BASE_URL/api/v1/identity/auth/register" \\) Tj ET
+BT /F3 8.5 Tf 46.00 373.00 Td (  -H "Content-Type: application/json" \\) Tj ET
+BT /F3 8.5 Tf 46.00 361.00 Td (  -d '{) Tj ET
+BT /F3 8.5 Tf 46.00 349.00 Td (    "phoneNumber": "+15551234567",) Tj ET
+BT /F3 8.5 Tf 46.00 337.00 Td (    "firstName": "Dami",) Tj ET
+BT /F3 8.5 Tf 46.00 325.00 Td (    "lastName": "Begud",) Tj ET
+BT /F3 8.5 Tf 46.00 313.00 Td (    "nickname": "dami",) Tj ET
+BT /F3 8.5 Tf 46.00 301.00 Td (    "dateOfBirth": "1995-04-20",) Tj ET
+BT /F3 8.5 Tf 46.00 289.00 Td (    "country": "US") Tj ET
+BT /F3 8.5 Tf 46.00 277.00 Td (  }') Tj ET
+BT /F2 13 Tf 46.00 242.00 Td (Verify Registration) Tj ET
+BT /F1 10.5 Tf 46.00 214.00 Td (Verifies the SMS code and returns user tokens.) Tj ET
+BT /F3 8.5 Tf 46.00 181.00 Td (POST /api/v1/identity/auth/register/verify) Tj ET
+BT /F3 8.5 Tf 46.00 169.00 Td (Content-Type: application/json) Tj ET
+BT /F1 10.5 Tf 46.00 139.00 Td (Request:) Tj ET
+BT /F3 8.5 Tf 46.00 106.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 94.00 Td (  "phoneNumber": "+15551234567",) Tj ET
+BT /F3 8.5 Tf 46.00 82.00 Td (  "verificationCode": "123456") Tj ET
+BT /F3 8.5 Tf 46.00 70.00 Td (}) Tj ET
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 10 0 R >>
+endobj
+12 0 obj
+<< /Length 2550 >>
+stream
+BT /F1 10.5 Tf 46.00 796.00 Td (Validation:) Tj ET
+BT /F3 8.5 Tf 46.00 772.00 Td (Field | Required | Rule) Tj ET
+BT /F3 8.5 Tf 46.00 760.00 Td (phoneNumber | yes | E.164 format) Tj ET
+BT /F3 8.5 Tf 46.00 748.00 Td (verificationCode | yes | exactly 6 digits) Tj ET
+BT /F1 10.5 Tf 46.00 727.00 Td (Response:) Tj ET
+BT /F3 8.5 Tf 46.00 694.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 682.00 Td (  "metadata": {) Tj ET
+BT /F3 8.5 Tf 46.00 670.00 Td (    "status": 200,) Tj ET
+BT /F3 8.5 Tf 46.00 658.00 Td (    "message": "Registration verified") Tj ET
+BT /F3 8.5 Tf 46.00 646.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 634.00 Td (  "data": {) Tj ET
+BT /F3 8.5 Tf 46.00 622.00 Td (    "accessToken": "jwt-access-token",) Tj ET
+BT /F3 8.5 Tf 46.00 610.00 Td (    "refreshToken": "uuid-refresh-token") Tj ET
+BT /F3 8.5 Tf 46.00 598.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 586.00 Td (  "error": null) Tj ET
+BT /F3 8.5 Tf 46.00 574.00 Td (}) Tj ET
+BT /F1 10.5 Tf 46.00 544.00 Td (Example:) Tj ET
+BT /F3 8.5 Tf 46.00 511.00 Td (curl -X POST "$IDENTITY_BASE_URL/api/v1/identity/auth/register/verify" \\) Tj ET
+BT /F3 8.5 Tf 46.00 499.00 Td (  -H "Content-Type: application/json" \\) Tj ET
+BT /F3 8.5 Tf 46.00 487.00 Td (  -d '{) Tj ET
+BT /F3 8.5 Tf 46.00 475.00 Td (    "phoneNumber": "+15551234567",) Tj ET
+BT /F3 8.5 Tf 46.00 463.00 Td (    "verificationCode": "123456") Tj ET
+BT /F3 8.5 Tf 46.00 451.00 Td (  }') Tj ET
+BT /F2 13 Tf 46.00 416.00 Td (Refresh Token) Tj ET
+BT /F1 10.5 Tf 46.00 388.00 Td (Returns a new access token and refresh token.) Tj ET
+BT /F3 8.5 Tf 46.00 355.00 Td (POST /api/v1/identity/auth/token/refresh) Tj ET
+BT /F3 8.5 Tf 46.00 343.00 Td (Content-Type: application/json) Tj ET
+BT /F1 10.5 Tf 46.00 313.00 Td (Request:) Tj ET
+BT /F3 8.5 Tf 46.00 280.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 268.00 Td (  "refreshToken": "uuid-refresh-token") Tj ET
+BT /F3 8.5 Tf 46.00 256.00 Td (}) Tj ET
+BT /F1 10.5 Tf 46.00 226.00 Td (Response:) Tj ET
+BT /F3 8.5 Tf 46.00 193.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 181.00 Td (  "metadata": {) Tj ET
+BT /F3 8.5 Tf 46.00 169.00 Td (    "status": 200,) Tj ET
+BT /F3 8.5 Tf 46.00 157.00 Td (    "message": "Token refreshed") Tj ET
+BT /F3 8.5 Tf 46.00 145.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 133.00 Td (  "data": {) Tj ET
+BT /F3 8.5 Tf 46.00 121.00 Td (    "accessToken": "new-jwt-access-token",) Tj ET
+BT /F3 8.5 Tf 46.00 109.00 Td (    "refreshToken": "new-uuid-refresh-token") Tj ET
+BT /F3 8.5 Tf 46.00 97.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 85.00 Td (  "error": null) Tj ET
+BT /F3 8.5 Tf 46.00 73.00 Td (}) Tj ET
+endstream
+endobj
+13 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 12 0 R >>
+endobj
+14 0 obj
+<< /Length 2447 >>
+stream
+BT /F2 13 Tf 46.00 791.00 Td (Validate Token) Tj ET
+BT /F1 10.5 Tf 46.00 763.00 Td (Validates a bearer token and returns token identity. This is mainly for backend services.) Tj ET
+BT /F3 8.5 Tf 46.00 730.00 Td (POST /api/v1/identity/auth/token/validate) Tj ET
+BT /F3 8.5 Tf 46.00 718.00 Td (Authorization: Bearer <token>) Tj ET
+BT /F1 10.5 Tf 46.00 688.00 Td (Response:) Tj ET
+BT /F3 8.5 Tf 46.00 655.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 643.00 Td (  "metadata": {) Tj ET
+BT /F3 8.5 Tf 46.00 631.00 Td (    "status": 200,) Tj ET
+BT /F3 8.5 Tf 46.00 619.00 Td (    "message": "Token is valid") Tj ET
+BT /F3 8.5 Tf 46.00 607.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 595.00 Td (  "data": {) Tj ET
+BT /F3 8.5 Tf 46.00 583.00 Td (    "subject": "user-id-or-service-id",) Tj ET
+BT /F3 8.5 Tf 46.00 571.00 Td (    "tokenType": "user",) Tj ET
+BT /F3 8.5 Tf 46.00 559.00 Td (    "role": "USER",) Tj ET
+BT /F3 8.5 Tf 46.00 547.00 Td (    "expiresAt": "2026-05-19T18:30:00Z") Tj ET
+BT /F3 8.5 Tf 46.00 535.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 523.00 Td (  "error": null) Tj ET
+BT /F3 8.5 Tf 46.00 511.00 Td (}) Tj ET
+BT /F1 10.5 Tf 46.00 481.00 Td (User access tokens contain:) Tj ET
+BT /F3 8.5 Tf 46.00 448.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 436.00 Td (  "sub": "user-uuid",) Tj ET
+BT /F3 8.5 Tf 46.00 424.00 Td (  "token_type": "user",) Tj ET
+BT /F3 8.5 Tf 46.00 412.00 Td (  "role": "USER") Tj ET
+BT /F3 8.5 Tf 46.00 400.00 Td (}) Tj ET
+BT /F1 10.5 Tf 46.00 370.00 Td (The mobile app can decode the access token locally to read the current user id from sub, but) Tj ET
+BT /F1 10.5 Tf 46.00 355.00 Td (authorization should still rely on backend validation.) Tj ET
+BT /F2 13 Tf 46.00 326.00 Td (Issue Internal Service Token) Tj ET
+BT /F1 10.5 Tf 46.00 298.00 Td (Internal only. Mobile clients should not call this endpoint.) Tj ET
+BT /F3 8.5 Tf 46.00 265.00 Td (POST /api/v1/identity/auth/service-token) Tj ET
+BT /F3 8.5 Tf 46.00 253.00 Td (Content-Type: application/json) Tj ET
+BT /F1 10.5 Tf 46.00 223.00 Td (Request:) Tj ET
+BT /F3 8.5 Tf 46.00 190.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 178.00 Td (  "clientId": "chat-service",) Tj ET
+BT /F3 8.5 Tf 46.00 166.00 Td (  "clientSecret": "local-chat-service-secret") Tj ET
+BT /F3 8.5 Tf 46.00 154.00 Td (}) Tj ET
+BT /F1 10.5 Tf 46.00 124.00 Td (Response:) Tj ET
+BT /F3 8.5 Tf 46.00 91.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 79.00 Td (  "metadata": {) Tj ET
+BT /F3 8.5 Tf 46.00 67.00 Td (    "status": 200,) Tj ET
+endstream
+endobj
+15 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 14 0 R >>
+endobj
+16 0 obj
+<< /Length 2693 >>
+stream
+BT /F3 8.5 Tf 46.00 796.00 Td (    "message": "Service token issued") Tj ET
+BT /F3 8.5 Tf 46.00 784.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 772.00 Td (  "data": {) Tj ET
+BT /F3 8.5 Tf 46.00 760.00 Td (    "accessToken": "jwt-service-token",) Tj ET
+BT /F3 8.5 Tf 46.00 748.00 Td (    "tokenType": "service",) Tj ET
+BT /F3 8.5 Tf 46.00 736.00 Td (    "role": "INTERNAL_SERVICE",) Tj ET
+BT /F3 8.5 Tf 46.00 724.00 Td (    "expiresAt": "2026-05-19T18:30:00Z") Tj ET
+BT /F3 8.5 Tf 46.00 712.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 700.00 Td (  "error": null) Tj ET
+BT /F3 8.5 Tf 46.00 688.00 Td (}) Tj ET
+BT /F2 13 Tf 46.00 653.00 Td (Get User By ID) Tj ET
+BT /F1 10.5 Tf 46.00 625.00 Td (Internal only. Mobile clients should not call this endpoint.) Tj ET
+BT /F3 8.5 Tf 46.00 592.00 Td (GET /api/v1/identity/users/{userId}) Tj ET
+BT /F3 8.5 Tf 46.00 580.00 Td (Authorization: Bearer <internal-service-token>) Tj ET
+BT /F1 10.5 Tf 46.00 550.00 Td (Response:) Tj ET
+BT /F3 8.5 Tf 46.00 517.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 505.00 Td (  "metadata": {) Tj ET
+BT /F3 8.5 Tf 46.00 493.00 Td (    "status": 200,) Tj ET
+BT /F3 8.5 Tf 46.00 481.00 Td (    "message": "User fetched") Tj ET
+BT /F3 8.5 Tf 46.00 469.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 457.00 Td (  "data": {) Tj ET
+BT /F3 8.5 Tf 46.00 445.00 Td (    "userId": "793de6b4-7ced-4a80-80c7-dd22d9b90a72",) Tj ET
+BT /F3 8.5 Tf 46.00 433.00 Td (    "phoneNumber": "+15551234567") Tj ET
+BT /F3 8.5 Tf 46.00 421.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 409.00 Td (  "error": null) Tj ET
+BT /F3 8.5 Tf 46.00 397.00 Td (}) Tj ET
+BT /F2 13 Tf 46.00 362.00 Td (Get User By Phone Number) Tj ET
+BT /F1 10.5 Tf 46.00 334.00 Td (Internal only. Mobile clients should not call this endpoint. Chat-service uses it to resolve) Tj ET
+BT /F1 10.5 Tf 46.00 319.00 Td (private message recipients before enqueueing messages.) Tj ET
+BT /F3 8.5 Tf 46.00 286.00 Td (GET /api/v1/identity/users/by-phone/{phoneNumber}) Tj ET
+BT /F3 8.5 Tf 46.00 274.00 Td (Authorization: Bearer <internal-service-token>) Tj ET
+BT /F1 10.5 Tf 46.00 244.00 Td (Response:) Tj ET
+BT /F3 8.5 Tf 46.00 211.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 199.00 Td (  "metadata": {) Tj ET
+BT /F3 8.5 Tf 46.00 187.00 Td (    "status": 200,) Tj ET
+BT /F3 8.5 Tf 46.00 175.00 Td (    "message": "User fetched") Tj ET
+BT /F3 8.5 Tf 46.00 163.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 151.00 Td (  "data": {) Tj ET
+BT /F3 8.5 Tf 46.00 139.00 Td (    "userId": "ac9b3a0a-bedb-45bc-975c-9a3b83a6ca09",) Tj ET
+BT /F3 8.5 Tf 46.00 127.00 Td (    "phoneNumber": "+15557654321") Tj ET
+BT /F3 8.5 Tf 46.00 115.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 103.00 Td (  "error": null) Tj ET
+BT /F3 8.5 Tf 46.00 91.00 Td (}) Tj ET
+endstream
+endobj
+17 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 16 0 R >>
+endobj
+18 0 obj
+<< /Length 2320 >>
+stream
+BT /F2 13 Tf 46.00 796.00 Td (Identity Smoke Check) Tj ET
+BT /F3 8.5 Tf 46.00 759.00 Td (GET /api/v1/identity) Tj ET
+BT /F1 10.5 Tf 46.00 729.00 Td (Returns 200 OK with empty body.) Tj ET
+BT /F2 16 Tf 46.00 700.00 Td (Group Service) Tj ET
+BT /F1 10.5 Tf 46.00 663.00 Td (Base URL:) Tj ET
+BT /F3 8.5 Tf 46.00 630.00 Td ($GROUP_BASE_URL/api/v1/groups) Tj ET
+BT /F1 10.5 Tf 46.00 600.00 Td (All group APIs require a user access token unless explicitly called by an internal service.) Tj ET
+BT /F2 13 Tf 46.00 571.00 Td (Create Group) Tj ET
+BT /F3 8.5 Tf 46.00 534.00 Td (POST /api/v1/groups) Tj ET
+BT /F3 8.5 Tf 46.00 522.00 Td (Authorization: Bearer <user-access-token>) Tj ET
+BT /F3 8.5 Tf 46.00 510.00 Td (Content-Type: application/json) Tj ET
+BT /F1 10.5 Tf 46.00 480.00 Td (Request:) Tj ET
+BT /F3 8.5 Tf 46.00 447.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 435.00 Td (  "name": "Best Friends") Tj ET
+BT /F3 8.5 Tf 46.00 423.00 Td (}) Tj ET
+BT /F1 10.5 Tf 46.00 393.00 Td (Validation:) Tj ET
+BT /F3 8.5 Tf 46.00 369.00 Td (Field | Required | Rule) Tj ET
+BT /F3 8.5 Tf 46.00 357.00 Td (name | yes | not blank, max 120 chars) Tj ET
+BT /F1 10.5 Tf 46.00 336.00 Td (Response:) Tj ET
+BT /F3 8.5 Tf 46.00 303.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 291.00 Td (  "metadata": {) Tj ET
+BT /F3 8.5 Tf 46.00 279.00 Td (    "status": 201,) Tj ET
+BT /F3 8.5 Tf 46.00 267.00 Td (    "message": "Group created") Tj ET
+BT /F3 8.5 Tf 46.00 255.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 243.00 Td (  "data": {) Tj ET
+BT /F3 8.5 Tf 46.00 231.00 Td (    "id": "9d46599f-27cb-4d2b-8d3b-4fffce6773d3",) Tj ET
+BT /F3 8.5 Tf 46.00 219.00 Td (    "ownerId": "793de6b4-7ced-4a80-80c7-dd22d9b90a72",) Tj ET
+BT /F3 8.5 Tf 46.00 207.00 Td (    "name": "Best Friends",) Tj ET
+BT /F3 8.5 Tf 46.00 195.00 Td (    "createdAt": "2026-05-19T13:25:19.952135Z") Tj ET
+BT /F3 8.5 Tf 46.00 183.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 171.00 Td (  "error": null) Tj ET
+BT /F3 8.5 Tf 46.00 159.00 Td (}) Tj ET
+BT /F1 10.5 Tf 46.00 129.00 Td (Example:) Tj ET
+BT /F3 8.5 Tf 46.00 96.00 Td (curl -X POST "$GROUP_BASE_URL/api/v1/groups" \\) Tj ET
+BT /F3 8.5 Tf 46.00 84.00 Td (  -H "Authorization: Bearer $ACCESS_TOKEN" \\) Tj ET
+BT /F3 8.5 Tf 46.00 72.00 Td (  -H "Content-Type: application/json" \\) Tj ET
+BT /F3 8.5 Tf 46.00 60.00 Td (  -d '{ "name": "Best Friends" }') Tj ET
+endstream
+endobj
+19 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 18 0 R >>
+endobj
+20 0 obj
+<< /Length 2454 >>
+stream
+BT /F2 13 Tf 46.00 782.00 Td (Add Group Member) Tj ET
+BT /F1 10.5 Tf 46.00 754.00 Td (Only the group owner can add members.) Tj ET
+BT /F3 8.5 Tf 46.00 721.00 Td (POST /api/v1/groups/{groupId}/members) Tj ET
+BT /F3 8.5 Tf 46.00 709.00 Td (Authorization: Bearer <owner-access-token>) Tj ET
+BT /F3 8.5 Tf 46.00 697.00 Td (Content-Type: application/json) Tj ET
+BT /F1 10.5 Tf 46.00 667.00 Td (Request:) Tj ET
+BT /F3 8.5 Tf 46.00 634.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 622.00 Td (  "phoneNumber": "+15557654321") Tj ET
+BT /F3 8.5 Tf 46.00 610.00 Td (}) Tj ET
+BT /F1 10.5 Tf 46.00 580.00 Td (Group-service resolves phoneNumber to the member's internal UUID through identity-service) Tj ET
+BT /F1 10.5 Tf 46.00 565.00 Td (before storing the group membership.) Tj ET
+BT /F1 10.5 Tf 46.00 541.00 Td (Response:) Tj ET
+BT /F3 8.5 Tf 46.00 508.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 496.00 Td (  "metadata": {) Tj ET
+BT /F3 8.5 Tf 46.00 484.00 Td (    "status": 201,) Tj ET
+BT /F3 8.5 Tf 46.00 472.00 Td (    "message": "Group member added") Tj ET
+BT /F3 8.5 Tf 46.00 460.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 448.00 Td (  "data": {) Tj ET
+BT /F3 8.5 Tf 46.00 436.00 Td (    "groupId": "9d46599f-27cb-4d2b-8d3b-4fffce6773d3",) Tj ET
+BT /F3 8.5 Tf 46.00 424.00 Td (    "userId": "ac9b3a0a-bedb-45bc-975c-9a3b83a6ca09",) Tj ET
+BT /F3 8.5 Tf 46.00 412.00 Td (    "role": "MEMBER",) Tj ET
+BT /F3 8.5 Tf 46.00 400.00 Td (    "joinedAt": "2026-05-19T13:25:19.952135Z") Tj ET
+BT /F3 8.5 Tf 46.00 388.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 376.00 Td (  "error": null) Tj ET
+BT /F3 8.5 Tf 46.00 364.00 Td (}) Tj ET
+BT /F2 13 Tf 46.00 329.00 Td (Remove Group Member) Tj ET
+BT /F1 10.5 Tf 46.00 301.00 Td (Only the group owner can remove another member. The owner cannot remove themself.) Tj ET
+BT /F3 8.5 Tf 46.00 268.00 Td (DELETE /api/v1/groups/{groupId}/members/{userId}) Tj ET
+BT /F3 8.5 Tf 46.00 256.00 Td (Authorization: Bearer <owner-access-token>) Tj ET
+BT /F1 10.5 Tf 46.00 226.00 Td (Response:) Tj ET
+BT /F3 8.5 Tf 46.00 193.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 181.00 Td (  "metadata": {) Tj ET
+BT /F3 8.5 Tf 46.00 169.00 Td (    "status": 200,) Tj ET
+BT /F3 8.5 Tf 46.00 157.00 Td (    "message": "Group member removed") Tj ET
+BT /F3 8.5 Tf 46.00 145.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 133.00 Td (  "data": null,) Tj ET
+BT /F3 8.5 Tf 46.00 121.00 Td (  "error": null) Tj ET
+BT /F3 8.5 Tf 46.00 109.00 Td (}) Tj ET
+BT /F2 13 Tf 46.00 74.00 Td (Leave Group) Tj ET
+endstream
+endobj
+21 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 20 0 R >>
+endobj
+22 0 obj
+<< /Length 2652 >>
+stream
+BT /F1 10.5 Tf 46.00 796.00 Td (A member can remove themself from a group. The owner cannot leave through this endpoint until) Tj ET
+BT /F1 10.5 Tf 46.00 781.00 Td (ownership transfer exists.) Tj ET
+BT /F3 8.5 Tf 46.00 748.00 Td (DELETE /api/v1/groups/{groupId}/members/me) Tj ET
+BT /F3 8.5 Tf 46.00 736.00 Td (Authorization: Bearer <user-access-token>) Tj ET
+BT /F1 10.5 Tf 46.00 706.00 Td (Response:) Tj ET
+BT /F3 8.5 Tf 46.00 673.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 661.00 Td (  "metadata": {) Tj ET
+BT /F3 8.5 Tf 46.00 649.00 Td (    "status": 200,) Tj ET
+BT /F3 8.5 Tf 46.00 637.00 Td (    "message": "Left group") Tj ET
+BT /F3 8.5 Tf 46.00 625.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 613.00 Td (  "data": null,) Tj ET
+BT /F3 8.5 Tf 46.00 601.00 Td (  "error": null) Tj ET
+BT /F3 8.5 Tf 46.00 589.00 Td (}) Tj ET
+BT /F2 13 Tf 46.00 554.00 Td (Get Group Members) Tj ET
+BT /F1 10.5 Tf 46.00 526.00 Td (Available to group members and internal services.) Tj ET
+BT /F3 8.5 Tf 46.00 493.00 Td (GET /api/v1/groups/{groupId}/members) Tj ET
+BT /F3 8.5 Tf 46.00 481.00 Td (Authorization: Bearer <user-access-token>) Tj ET
+BT /F1 10.5 Tf 46.00 451.00 Td (Response:) Tj ET
+BT /F3 8.5 Tf 46.00 418.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 406.00 Td (  "metadata": {) Tj ET
+BT /F3 8.5 Tf 46.00 394.00 Td (    "status": 200,) Tj ET
+BT /F3 8.5 Tf 46.00 382.00 Td (    "message": "Group members fetched") Tj ET
+BT /F3 8.5 Tf 46.00 370.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 358.00 Td (  "data": [) Tj ET
+BT /F3 8.5 Tf 46.00 346.00 Td (    {) Tj ET
+BT /F3 8.5 Tf 46.00 334.00 Td (      "groupId": "9d46599f-27cb-4d2b-8d3b-4fffce6773d3",) Tj ET
+BT /F3 8.5 Tf 46.00 322.00 Td (      "userId": "793de6b4-7ced-4a80-80c7-dd22d9b90a72",) Tj ET
+BT /F3 8.5 Tf 46.00 310.00 Td (      "role": "OWNER",) Tj ET
+BT /F3 8.5 Tf 46.00 298.00 Td (      "joinedAt": "2026-05-19T13:25:19.952135Z") Tj ET
+BT /F3 8.5 Tf 46.00 286.00 Td (    },) Tj ET
+BT /F3 8.5 Tf 46.00 274.00 Td (    {) Tj ET
+BT /F3 8.5 Tf 46.00 262.00 Td (      "groupId": "9d46599f-27cb-4d2b-8d3b-4fffce6773d3",) Tj ET
+BT /F3 8.5 Tf 46.00 250.00 Td (      "userId": "ac9b3a0a-bedb-45bc-975c-9a3b83a6ca09",) Tj ET
+BT /F3 8.5 Tf 46.00 238.00 Td (      "role": "MEMBER",) Tj ET
+BT /F3 8.5 Tf 46.00 226.00 Td (      "joinedAt": "2026-05-19T13:26:00.000000Z") Tj ET
+BT /F3 8.5 Tf 46.00 214.00 Td (    }) Tj ET
+BT /F3 8.5 Tf 46.00 202.00 Td (  ],) Tj ET
+BT /F3 8.5 Tf 46.00 190.00 Td (  "error": null) Tj ET
+BT /F3 8.5 Tf 46.00 178.00 Td (}) Tj ET
+BT /F2 16 Tf 46.00 143.00 Td (Chat WebSocket API) Tj ET
+BT /F1 10.5 Tf 46.00 106.00 Td (Chat uses raw WebSocket with STOMP.) Tj ET
+BT /F1 10.5 Tf 46.00 82.00 Td (Endpoint:) Tj ET
+endstream
+endobj
+23 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 22 0 R >>
+endobj
+24 0 obj
+<< /Length 2451 >>
+stream
+BT /F3 8.5 Tf 46.00 796.00 Td ($CHAT_WS_URL) Tj ET
+BT /F1 10.5 Tf 46.00 766.00 Td (STOMP app destination prefix:) Tj ET
+BT /F3 8.5 Tf 46.00 733.00 Td (/app) Tj ET
+BT /F1 10.5 Tf 46.00 703.00 Td (STOMP user destination prefix:) Tj ET
+BT /F3 8.5 Tf 46.00 670.00 Td (/user) Tj ET
+BT /F1 10.5 Tf 46.00 640.00 Td (Connect with user access token:) Tj ET
+BT /F3 8.5 Tf 46.00 607.00 Td (CONNECT) Tj ET
+BT /F3 8.5 Tf 46.00 595.00 Td (Authorization: Bearer <user-access-token>) Tj ET
+BT /F3 8.5 Tf 46.00 583.00 Td (accept-version:1.2,1.1,1.0) Tj ET
+BT /F3 8.5 Tf 46.00 571.00 Td (heart-beat:10000,10000) Tj ET
+BT /F1 10.5 Tf 46.00 541.00 Td (Chat-service validates this token through identity-service during CONNECT. The token must be a) Tj ET
+BT /F1 10.5 Tf 46.00 526.00 Td (user token with role USER.) Tj ET
+BT /F2 13 Tf 46.00 497.00 Td (Required Subscriptions) Tj ET
+BT /F1 10.5 Tf 46.00 469.00 Td (Subscribe to private messages:) Tj ET
+BT /F3 8.5 Tf 46.00 436.00 Td (/user/queue/private-messages) Tj ET
+BT /F1 10.5 Tf 46.00 406.00 Td (Payload received:) Tj ET
+BT /F3 8.5 Tf 46.00 373.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 361.00 Td (  "messageId": "42fa8a65-a118-49c9-bd50-0ff96116d0e8",) Tj ET
+BT /F3 8.5 Tf 46.00 349.00 Td (  "senderId": "793de6b4-7ced-4a80-80c7-dd22d9b90a72",) Tj ET
+BT /F3 8.5 Tf 46.00 337.00 Td (  "senderPhoneNumber": "+15551234567",) Tj ET
+BT /F3 8.5 Tf 46.00 325.00 Td (  "recipientId": "ac9b3a0a-bedb-45bc-975c-9a3b83a6ca09",) Tj ET
+BT /F3 8.5 Tf 46.00 313.00 Td (  "content": "Hello World",) Tj ET
+BT /F3 8.5 Tf 46.00 301.00 Td (  "sentAt": "2026-05-19T13:30:00.000000Z") Tj ET
+BT /F3 8.5 Tf 46.00 289.00 Td (}) Tj ET
+BT /F1 10.5 Tf 46.00 259.00 Td (Subscribe to private message status updates:) Tj ET
+BT /F3 8.5 Tf 46.00 226.00 Td (/user/queue/private-message-status) Tj ET
+BT /F1 10.5 Tf 46.00 196.00 Td (Payload received:) Tj ET
+BT /F3 8.5 Tf 46.00 163.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 151.00 Td (  "messageId": "42fa8a65-a118-49c9-bd50-0ff96116d0e8",) Tj ET
+BT /F3 8.5 Tf 46.00 139.00 Td (  "senderId": "793de6b4-7ced-4a80-80c7-dd22d9b90a72",) Tj ET
+BT /F3 8.5 Tf 46.00 127.00 Td (  "recipientId": "ac9b3a0a-bedb-45bc-975c-9a3b83a6ca09",) Tj ET
+BT /F3 8.5 Tf 46.00 115.00 Td (  "status": "DELIVERED",) Tj ET
+BT /F3 8.5 Tf 46.00 103.00 Td (  "actorUserId": "ac9b3a0a-bedb-45bc-975c-9a3b83a6ca09",) Tj ET
+BT /F3 8.5 Tf 46.00 91.00 Td (  "occurredAt": "2026-05-19T13:30:05.000000Z") Tj ET
+BT /F3 8.5 Tf 46.00 79.00 Td (}) Tj ET
+endstream
+endobj
+25 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 24 0 R >>
+endobj
+26 0 obj
+<< /Length 2473 >>
+stream
+BT /F1 10.5 Tf 46.00 796.00 Td (Status values:) Tj ET
+BT /F3 8.5 Tf 46.00 772.00 Td (Status | Meaning) Tj ET
+BT /F3 8.5 Tf 46.00 760.00 Td (SENT | Message was stored successfully by message-storage-service.) Tj ET
+BT /F3 8.5 Tf 46.00 748.00 Td (DELIVERED | Recipient acknowledged receiving the message.) Tj ET
+BT /F3 8.5 Tf 46.00 736.00 Td (READ | Recipient acknowledged reading the message.) Tj ET
+BT /F2 13 Tf 46.00 710.00 Td (Send Private Message) Tj ET
+BT /F1 10.5 Tf 46.00 682.00 Td (Destination:) Tj ET
+BT /F3 8.5 Tf 46.00 649.00 Td (/app/chat.private) Tj ET
+BT /F1 10.5 Tf 46.00 619.00 Td (Body:) Tj ET
+BT /F3 8.5 Tf 46.00 586.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 574.00 Td (  "recipientPhoneNumber": "+15557654321",) Tj ET
+BT /F3 8.5 Tf 46.00 562.00 Td (  "content": "Hello World") Tj ET
+BT /F3 8.5 Tf 46.00 550.00 Td (}) Tj ET
+BT /F1 10.5 Tf 46.00 520.00 Td (Validation:) Tj ET
+BT /F3 8.5 Tf 46.00 496.00 Td (Field | Required | Rule) Tj ET
+BT /F3 8.5 Tf 46.00 484.00 Td (recipientPhoneNumber | yes | E.164 format) Tj ET
+BT /F3 8.5 Tf 46.00 472.00 Td (content | yes | not blank, max 4000 chars) Tj ET
+BT /F1 10.5 Tf 46.00 451.00 Td (Notes:) Tj ET
+BT /F1 10.5 Tf 46.00 427.00 Td (- The sender is resolved from the WebSocket access token.) Tj ET
+BT /F1 10.5 Tf 46.00 412.00 Td (- Chat-service resolves recipientPhoneNumber to the recipient's internal UUID through identity-) Tj ET
+BT /F1 10.5 Tf 46.00 397.00 Td (service before enqueueing the message.) Tj ET
+BT /F1 10.5 Tf 46.00 382.00 Td (- The private message payload includes senderPhoneNumber so receivers can display the sender's) Tj ET
+BT /F1 10.5 Tf 46.00 367.00 Td (phone number.) Tj ET
+BT /F1 10.5 Tf 46.00 352.00 Td (- The message is eventually delivered to both sender and recipient on /user/queue/private-) Tj ET
+BT /F1 10.5 Tf 46.00 337.00 Td (messages.) Tj ET
+BT /F1 10.5 Tf 46.00 322.00 Td (- The message is also stored asynchronously by message-storage-service.) Tj ET
+BT /F2 13 Tf 46.00 293.00 Td (Acknowledge Delivered) Tj ET
+BT /F1 10.5 Tf 46.00 265.00 Td (Only the recipient can acknowledge DELIVERED.) Tj ET
+BT /F1 10.5 Tf 46.00 241.00 Td (Destination:) Tj ET
+BT /F3 8.5 Tf 46.00 208.00 Td (/app/chat.private.delivered) Tj ET
+BT /F1 10.5 Tf 46.00 178.00 Td (Body:) Tj ET
+BT /F3 8.5 Tf 46.00 145.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 133.00 Td (  "messageId": "42fa8a65-a118-49c9-bd50-0ff96116d0e8") Tj ET
+BT /F3 8.5 Tf 46.00 121.00 Td (}) Tj ET
+BT /F2 13 Tf 46.00 86.00 Td (Acknowledge Read) Tj ET
+endstream
+endobj
+27 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 26 0 R >>
+endobj
+28 0 obj
+<< /Length 3403 >>
+stream
+BT /F1 10.5 Tf 46.00 796.00 Td (Only the recipient can acknowledge READ.) Tj ET
+BT /F1 10.5 Tf 46.00 772.00 Td (Destination:) Tj ET
+BT /F3 8.5 Tf 46.00 739.00 Td (/app/chat.private.read) Tj ET
+BT /F1 10.5 Tf 46.00 709.00 Td (Body:) Tj ET
+BT /F3 8.5 Tf 46.00 676.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 664.00 Td (  "messageId": "42fa8a65-a118-49c9-bd50-0ff96116d0e8") Tj ET
+BT /F3 8.5 Tf 46.00 652.00 Td (}) Tj ET
+BT /F2 13 Tf 46.00 617.00 Td (STOMP JavaScript Example) Tj ET
+BT /F1 10.5 Tf 46.00 589.00 Td (This is a minimal browser-compatible example. Mobile clients should use the equivalent STOMP) Tj ET
+BT /F1 10.5 Tf 46.00 574.00 Td (client for their platform.) Tj ET
+BT /F3 8.5 Tf 46.00 541.00 Td (import { Client } from "@stomp/stompjs";) Tj ET
+BT /F3 8.5 Tf 46.00 529.00 Td () Tj ET
+BT /F3 8.5 Tf 46.00 517.00 Td (const accessToken = "user-access-token";) Tj ET
+BT /F3 8.5 Tf 46.00 505.00 Td (// Use the same value as CHAT_WS_URL for your environment.) Tj ET
+BT /F3 8.5 Tf 46.00 493.00 Td (const chatWsUrl = "ws://dev0:30083/ws/chat";) Tj ET
+BT /F3 8.5 Tf 46.00 481.00 Td () Tj ET
+BT /F3 8.5 Tf 46.00 469.00 Td (const client = new Client\({) Tj ET
+BT /F3 8.5 Tf 46.00 457.00 Td (  brokerURL: chatWsUrl,) Tj ET
+BT /F3 8.5 Tf 46.00 445.00 Td (  connectHeaders: {) Tj ET
+BT /F3 8.5 Tf 46.00 433.00 Td (    Authorization: `Bearer ${accessToken}`,) Tj ET
+BT /F3 8.5 Tf 46.00 421.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 409.00 Td (  onConnect: \(\) => {) Tj ET
+BT /F3 8.5 Tf 46.00 397.00 Td (    client.subscribe\("/user/queue/private-messages", \(frame\) => {) Tj ET
+BT /F3 8.5 Tf 46.00 385.00 Td (      const message = JSON.parse\(frame.body\);) Tj ET
+BT /F3 8.5 Tf 46.00 373.00 Td (      console.log\("message", message\);) Tj ET
+BT /F3 8.5 Tf 46.00 361.00 Td () Tj ET
+BT /F3 8.5 Tf 46.00 349.00 Td (      client.publish\({) Tj ET
+BT /F3 8.5 Tf 46.00 337.00 Td (        destination: "/app/chat.private.delivered",) Tj ET
+BT /F3 8.5 Tf 46.00 325.00 Td (        body: JSON.stringify\({ messageId: message.messageId }\),) Tj ET
+BT /F3 8.5 Tf 46.00 313.00 Td (        headers: { "content-type": "application/json" },) Tj ET
+BT /F3 8.5 Tf 46.00 301.00 Td (      }\);) Tj ET
+BT /F3 8.5 Tf 46.00 289.00 Td (    }\);) Tj ET
+BT /F3 8.5 Tf 46.00 277.00 Td () Tj ET
+BT /F3 8.5 Tf 46.00 265.00 Td (    client.subscribe\("/user/queue/private-message-status", \(frame\) => {) Tj ET
+BT /F3 8.5 Tf 46.00 253.00 Td (      console.log\("status", JSON.parse\(frame.body\)\);) Tj ET
+BT /F3 8.5 Tf 46.00 241.00 Td (    }\);) Tj ET
+BT /F3 8.5 Tf 46.00 229.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 217.00 Td (}\);) Tj ET
+BT /F3 8.5 Tf 46.00 205.00 Td () Tj ET
+BT /F3 8.5 Tf 46.00 193.00 Td (client.activate\(\);) Tj ET
+BT /F3 8.5 Tf 46.00 181.00 Td () Tj ET
+BT /F3 8.5 Tf 46.00 169.00 Td (function sendMessage\(recipientPhoneNumber, content\) {) Tj ET
+BT /F3 8.5 Tf 46.00 157.00 Td (  client.publish\({) Tj ET
+BT /F3 8.5 Tf 46.00 145.00 Td (    destination: "/app/chat.private",) Tj ET
+BT /F3 8.5 Tf 46.00 133.00 Td (    body: JSON.stringify\({ recipientPhoneNumber, content }\),) Tj ET
+BT /F3 8.5 Tf 46.00 121.00 Td (    headers: { "content-type": "application/json" },) Tj ET
+BT /F3 8.5 Tf 46.00 109.00 Td (  }\);) Tj ET
+BT /F3 8.5 Tf 46.00 97.00 Td (}) Tj ET
+BT /F3 8.5 Tf 46.00 85.00 Td () Tj ET
+BT /F3 8.5 Tf 46.00 73.00 Td (function markRead\(messageId\) {) Tj ET
+BT /F3 8.5 Tf 46.00 61.00 Td (  client.publish\({) Tj ET
+endstream
+endobj
+29 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 28 0 R >>
+endobj
+30 0 obj
+<< /Length 2310 >>
+stream
+BT /F3 8.5 Tf 46.00 796.00 Td (    destination: "/app/chat.private.read",) Tj ET
+BT /F3 8.5 Tf 46.00 784.00 Td (    body: JSON.stringify\({ messageId }\),) Tj ET
+BT /F3 8.5 Tf 46.00 772.00 Td (    headers: { "content-type": "application/json" },) Tj ET
+BT /F3 8.5 Tf 46.00 760.00 Td (  }\);) Tj ET
+BT /F3 8.5 Tf 46.00 748.00 Td (}) Tj ET
+BT /F2 16 Tf 46.00 713.00 Td (Presence Service) Tj ET
+BT /F1 10.5 Tf 46.00 676.00 Td (Presence-service is internal only. Mobile clients should not call it directly. Chat-service) Tj ET
+BT /F1 10.5 Tf 46.00 661.00 Td (calls it with an internal service token.) Tj ET
+BT /F1 10.5 Tf 46.00 637.00 Td (Base URL:) Tj ET
+BT /F3 8.5 Tf 46.00 604.00 Td (http://presence-service:8085/api/v1/presence) Tj ET
+BT /F1 10.5 Tf 46.00 574.00 Td (When debugging from outside the cluster, port-forward it first:) Tj ET
+BT /F3 8.5 Tf 46.00 541.00 Td (kubectl -n connect-chat port-forward svc/presence-service 8085:8085) Tj ET
+BT /F1 10.5 Tf 46.00 511.00 Td (Then use:) Tj ET
+BT /F3 8.5 Tf 46.00 478.00 Td (http://localhost:8085/api/v1/presence) Tj ET
+BT /F2 13 Tf 46.00 443.00 Td (Register Session) Tj ET
+BT /F1 10.5 Tf 46.00 415.00 Td (Internal only.) Tj ET
+BT /F3 8.5 Tf 46.00 382.00 Td (POST /api/v1/presence/sessions) Tj ET
+BT /F3 8.5 Tf 46.00 370.00 Td (Authorization: Bearer <internal-service-token>) Tj ET
+BT /F3 8.5 Tf 46.00 358.00 Td (Content-Type: application/json) Tj ET
+BT /F1 10.5 Tf 46.00 328.00 Td (Request:) Tj ET
+BT /F3 8.5 Tf 46.00 295.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 283.00 Td (  "userId": "793de6b4-7ced-4a80-80c7-dd22d9b90a72",) Tj ET
+BT /F3 8.5 Tf 46.00 271.00 Td (  "sessionId": "websocket-session-id",) Tj ET
+BT /F3 8.5 Tf 46.00 259.00 Td (  "instanceId": "chat-service:local-chat-service-1") Tj ET
+BT /F3 8.5 Tf 46.00 247.00 Td (}) Tj ET
+BT /F1 10.5 Tf 46.00 217.00 Td (Response:) Tj ET
+BT /F3 8.5 Tf 46.00 184.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 172.00 Td (  "metadata": {) Tj ET
+BT /F3 8.5 Tf 46.00 160.00 Td (    "status": 201,) Tj ET
+BT /F3 8.5 Tf 46.00 148.00 Td (    "message": "Presence session registered") Tj ET
+BT /F3 8.5 Tf 46.00 136.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 124.00 Td (  "data": null,) Tj ET
+BT /F3 8.5 Tf 46.00 112.00 Td (  "error": null) Tj ET
+BT /F3 8.5 Tf 46.00 100.00 Td (}) Tj ET
+BT /F2 13 Tf 46.00 65.00 Td (Remove Session) Tj ET
+endstream
+endobj
+31 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 30 0 R >>
+endobj
+32 0 obj
+<< /Length 2698 >>
+stream
+BT /F1 10.5 Tf 46.00 796.00 Td (Internal only.) Tj ET
+BT /F3 8.5 Tf 46.00 763.00 Td (DELETE /api/v1/presence/sessions/{sessionId}) Tj ET
+BT /F3 8.5 Tf 46.00 751.00 Td (Authorization: Bearer <internal-service-token>) Tj ET
+BT /F1 10.5 Tf 46.00 721.00 Td (Response:) Tj ET
+BT /F3 8.5 Tf 46.00 688.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 676.00 Td (  "metadata": {) Tj ET
+BT /F3 8.5 Tf 46.00 664.00 Td (    "status": 200,) Tj ET
+BT /F3 8.5 Tf 46.00 652.00 Td (    "message": "Presence session removed") Tj ET
+BT /F3 8.5 Tf 46.00 640.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 628.00 Td (  "data": null,) Tj ET
+BT /F3 8.5 Tf 46.00 616.00 Td (  "error": null) Tj ET
+BT /F3 8.5 Tf 46.00 604.00 Td (}) Tj ET
+BT /F2 13 Tf 46.00 569.00 Td (Get User Presence) Tj ET
+BT /F1 10.5 Tf 46.00 541.00 Td (Internal only.) Tj ET
+BT /F3 8.5 Tf 46.00 508.00 Td (GET /api/v1/presence/users/{userId}) Tj ET
+BT /F3 8.5 Tf 46.00 496.00 Td (Authorization: Bearer <internal-service-token>) Tj ET
+BT /F1 10.5 Tf 46.00 466.00 Td (Response:) Tj ET
+BT /F3 8.5 Tf 46.00 433.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 421.00 Td (  "metadata": {) Tj ET
+BT /F3 8.5 Tf 46.00 409.00 Td (    "status": 200,) Tj ET
+BT /F3 8.5 Tf 46.00 397.00 Td (    "message": "Presence fetched") Tj ET
+BT /F3 8.5 Tf 46.00 385.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 373.00 Td (  "data": {) Tj ET
+BT /F3 8.5 Tf 46.00 361.00 Td (    "userId": "793de6b4-7ced-4a80-80c7-dd22d9b90a72",) Tj ET
+BT /F3 8.5 Tf 46.00 349.00 Td (    "status": "ONLINE",) Tj ET
+BT /F3 8.5 Tf 46.00 337.00 Td (    "sessions": [) Tj ET
+BT /F3 8.5 Tf 46.00 325.00 Td (      {) Tj ET
+BT /F3 8.5 Tf 46.00 313.00 Td (        "userId": "793de6b4-7ced-4a80-80c7-dd22d9b90a72",) Tj ET
+BT /F3 8.5 Tf 46.00 301.00 Td (        "sessionId": "websocket-session-id",) Tj ET
+BT /F3 8.5 Tf 46.00 289.00 Td (        "instanceId": "chat-service:local-chat-service-1",) Tj ET
+BT /F3 8.5 Tf 46.00 277.00 Td (        "connectedAt": "2026-05-19T13:30:00.000000Z",) Tj ET
+BT /F3 8.5 Tf 46.00 265.00 Td (        "lastHeartbeatAt": "2026-05-19T13:30:00.000000Z") Tj ET
+BT /F3 8.5 Tf 46.00 253.00 Td (      }) Tj ET
+BT /F3 8.5 Tf 46.00 241.00 Td (    ],) Tj ET
+BT /F3 8.5 Tf 46.00 229.00 Td (    "updatedAt": "2026-05-19T13:30:00.000000Z") Tj ET
+BT /F3 8.5 Tf 46.00 217.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 205.00 Td (  "error": null) Tj ET
+BT /F3 8.5 Tf 46.00 193.00 Td (}) Tj ET
+BT /F1 10.5 Tf 46.00 163.00 Td (Presence statuses:) Tj ET
+BT /F3 8.5 Tf 46.00 130.00 Td (ONLINE) Tj ET
+BT /F3 8.5 Tf 46.00 118.00 Td (OFFLINE) Tj ET
+BT /F1 10.5 Tf 46.00 88.00 Td (Current implementation does not have heartbeat refresh yet. lastHeartbeatAt is set when the) Tj ET
+BT /F1 10.5 Tf 46.00 73.00 Td (session is registered.) Tj ET
+endstream
+endobj
+33 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 32 0 R >>
+endobj
+34 0 obj
+<< /Length 2718 >>
+stream
+BT /F2 13 Tf 46.00 796.00 Td (Check If User Is Online) Tj ET
+BT /F1 10.5 Tf 46.00 768.00 Td (Internal only.) Tj ET
+BT /F3 8.5 Tf 46.00 735.00 Td (GET /api/v1/presence/users/{userId}/online) Tj ET
+BT /F3 8.5 Tf 46.00 723.00 Td (Authorization: Bearer <internal-service-token>) Tj ET
+BT /F1 10.5 Tf 46.00 693.00 Td (Response:) Tj ET
+BT /F3 8.5 Tf 46.00 660.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 648.00 Td (  "metadata": {) Tj ET
+BT /F3 8.5 Tf 46.00 636.00 Td (    "status": 200,) Tj ET
+BT /F3 8.5 Tf 46.00 624.00 Td (    "message": "Presence status fetched") Tj ET
+BT /F3 8.5 Tf 46.00 612.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 600.00 Td (  "data": {) Tj ET
+BT /F3 8.5 Tf 46.00 588.00 Td (    "userId": "793de6b4-7ced-4a80-80c7-dd22d9b90a72",) Tj ET
+BT /F3 8.5 Tf 46.00 576.00 Td (    "online": true) Tj ET
+BT /F3 8.5 Tf 46.00 564.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 552.00 Td (  "error": null) Tj ET
+BT /F3 8.5 Tf 46.00 540.00 Td (}) Tj ET
+BT /F2 13 Tf 46.00 505.00 Td (Batch Presence Lookup) Tj ET
+BT /F1 10.5 Tf 46.00 477.00 Td (Internal only.) Tj ET
+BT /F3 8.5 Tf 46.00 444.00 Td (POST /api/v1/presence/users/lookup) Tj ET
+BT /F3 8.5 Tf 46.00 432.00 Td (Authorization: Bearer <internal-service-token>) Tj ET
+BT /F3 8.5 Tf 46.00 420.00 Td (Content-Type: application/json) Tj ET
+BT /F1 10.5 Tf 46.00 390.00 Td (Request:) Tj ET
+BT /F3 8.5 Tf 46.00 357.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 345.00 Td (  "userIds": [) Tj ET
+BT /F3 8.5 Tf 46.00 333.00 Td (    "793de6b4-7ced-4a80-80c7-dd22d9b90a72",) Tj ET
+BT /F3 8.5 Tf 46.00 321.00 Td (    "ac9b3a0a-bedb-45bc-975c-9a3b83a6ca09") Tj ET
+BT /F3 8.5 Tf 46.00 309.00 Td (  ]) Tj ET
+BT /F3 8.5 Tf 46.00 297.00 Td (}) Tj ET
+BT /F1 10.5 Tf 46.00 267.00 Td (Response:) Tj ET
+BT /F3 8.5 Tf 46.00 234.00 Td ({) Tj ET
+BT /F3 8.5 Tf 46.00 222.00 Td (  "metadata": {) Tj ET
+BT /F3 8.5 Tf 46.00 210.00 Td (    "status": 200,) Tj ET
+BT /F3 8.5 Tf 46.00 198.00 Td (    "message": "Presence lookup fetched") Tj ET
+BT /F3 8.5 Tf 46.00 186.00 Td (  },) Tj ET
+BT /F3 8.5 Tf 46.00 174.00 Td (  "data": [) Tj ET
+BT /F3 8.5 Tf 46.00 162.00 Td (    {) Tj ET
+BT /F3 8.5 Tf 46.00 150.00 Td (      "userId": "793de6b4-7ced-4a80-80c7-dd22d9b90a72",) Tj ET
+BT /F3 8.5 Tf 46.00 138.00 Td (      "status": "ONLINE",) Tj ET
+BT /F3 8.5 Tf 46.00 126.00 Td (      "sessions": [) Tj ET
+BT /F3 8.5 Tf 46.00 114.00 Td (        {) Tj ET
+BT /F3 8.5 Tf 46.00 102.00 Td (          "userId": "793de6b4-7ced-4a80-80c7-dd22d9b90a72",) Tj ET
+BT /F3 8.5 Tf 46.00 90.00 Td (          "sessionId": "websocket-session-id",) Tj ET
+BT /F3 8.5 Tf 46.00 78.00 Td (          "instanceId": "chat-service:local-chat-service-1",) Tj ET
+BT /F3 8.5 Tf 46.00 66.00 Td (          "connectedAt": "2026-05-19T13:30:00.000000Z",) Tj ET
+endstream
+endobj
+35 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 34 0 R >>
+endobj
+36 0 obj
+<< /Length 2510 >>
+stream
+BT /F3 8.5 Tf 46.00 796.00 Td (          "lastHeartbeatAt": "2026-05-19T13:30:00.000000Z") Tj ET
+BT /F3 8.5 Tf 46.00 784.00 Td (        }) Tj ET
+BT /F3 8.5 Tf 46.00 772.00 Td (      ],) Tj ET
+BT /F3 8.5 Tf 46.00 760.00 Td (      "updatedAt": "2026-05-19T13:30:00.000000Z") Tj ET
+BT /F3 8.5 Tf 46.00 748.00 Td (    },) Tj ET
+BT /F3 8.5 Tf 46.00 736.00 Td (    {) Tj ET
+BT /F3 8.5 Tf 46.00 724.00 Td (      "userId": "ac9b3a0a-bedb-45bc-975c-9a3b83a6ca09",) Tj ET
+BT /F3 8.5 Tf 46.00 712.00 Td (      "status": "OFFLINE",) Tj ET
+BT /F3 8.5 Tf 46.00 700.00 Td (      "sessions": [],) Tj ET
+BT /F3 8.5 Tf 46.00 688.00 Td (      "updatedAt": "2026-05-19T13:31:00.000000Z") Tj ET
+BT /F3 8.5 Tf 46.00 676.00 Td (    }) Tj ET
+BT /F3 8.5 Tf 46.00 664.00 Td (  ],) Tj ET
+BT /F3 8.5 Tf 46.00 652.00 Td (  "error": null) Tj ET
+BT /F3 8.5 Tf 46.00 640.00 Td (}) Tj ET
+BT /F2 16 Tf 46.00 605.00 Td (Message Storage Service) Tj ET
+BT /F1 10.5 Tf 46.00 568.00 Td (Message-storage-service currently has no mobile-facing REST API.) Tj ET
+BT /F1 10.5 Tf 46.00 544.00 Td (It consumes RabbitMQ events from chat-service and stores private messages/status updates.) Tj ET
+BT /F1 10.5 Tf 46.00 529.00 Td (Mobile clients receive messages and statuses through chat-service WebSocket subscriptions.) Tj ET
+BT /F2 16 Tf 46.00 500.00 Td (Health Endpoints) Tj ET
+BT /F1 10.5 Tf 46.00 463.00 Td (Each service exposes health:) Tj ET
+BT /F3 8.5 Tf 46.00 430.00 Td (GET /actuator/health) Tj ET
+BT /F1 10.5 Tf 46.00 400.00 Td (Examples:) Tj ET
+BT /F3 8.5 Tf 46.00 367.00 Td (curl "$IDENTITY_BASE_URL/actuator/health") Tj ET
+BT /F3 8.5 Tf 46.00 355.00 Td (curl "$GROUP_BASE_URL/actuator/health") Tj ET
+BT /F1 10.5 Tf 46.00 325.00 Td (For chat health:) Tj ET
+BT /F3 8.5 Tf 46.00 292.00 Td (curl "$CHAT_HTTP_BASE_URL/actuator/health") Tj ET
+BT /F1 10.5 Tf 46.00 262.00 Td (For internal services, port-forward before checking health:) Tj ET
+BT /F3 8.5 Tf 46.00 229.00 Td (kubectl -n connect-chat port-forward svc/message-storage-service 8084:8084) Tj ET
+BT /F3 8.5 Tf 46.00 217.00 Td (kubectl -n connect-chat port-forward svc/presence-service 8085:8085) Tj ET
+BT /F1 10.5 Tf 46.00 187.00 Td (Then, in separate terminals:) Tj ET
+BT /F3 8.5 Tf 46.00 154.00 Td (curl "http://localhost:8084/actuator/health") Tj ET
+BT /F3 8.5 Tf 46.00 142.00 Td (curl "http://localhost:8085/actuator/health") Tj ET
+BT /F2 16 Tf 46.00 107.00 Td (Recommended Mobile App Flow) Tj ET
+BT /F1 10.5 Tf 46.00 70.00 Td (1. Register user with POST /identity/auth/register.) Tj ET
+endstream
+endobj
+37 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 36 0 R >>
+endobj
+38 0 obj
+<< /Length 967 >>
+stream
+BT /F1 10.5 Tf 46.00 796.00 Td (2. Verify registration with POST /identity/auth/register/verify.) Tj ET
+BT /F1 10.5 Tf 46.00 781.00 Td (3. Store accessToken and refreshToken securely.) Tj ET
+BT /F1 10.5 Tf 46.00 766.00 Td (4. Use accessToken for group REST APIs.) Tj ET
+BT /F1 10.5 Tf 46.00 751.00 Td (5. Connect to chat WebSocket with Authorization: Bearer <accessToken>.) Tj ET
+BT /F1 10.5 Tf 46.00 736.00 Td (6. Subscribe to /user/queue/private-messages.) Tj ET
+BT /F1 10.5 Tf 46.00 721.00 Td (7. Subscribe to /user/queue/private-message-status.) Tj ET
+BT /F1 10.5 Tf 46.00 706.00 Td (8. Send private messages to /app/chat.private with recipientPhoneNumber.) Tj ET
+BT /F1 10.5 Tf 46.00 691.00 Td (9. When receiving a message as recipient, publish delivered/read acknowledgements.) Tj ET
+BT /F1 10.5 Tf 46.00 676.00 Td (10. Refresh tokens with POST /identity/auth/token/refresh before or after access token) Tj ET
+BT /F1 10.5 Tf 46.00 661.00 Td (expiration.) Tj ET
+endstream
+endobj
+39 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 38 0 R >>
+endobj
+xref
+0 40
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000227 00000 n 
+0000000297 00000 n 
+0000000372 00000 n 
+0000000440 00000 n 
+0000004034 00000 n 
+0000004180 00000 n 
+0000006641 00000 n 
+0000006787 00000 n 
+0000009623 00000 n 
+0000009771 00000 n 
+0000012373 00000 n 
+0000012521 00000 n 
+0000015020 00000 n 
+0000015168 00000 n 
+0000017913 00000 n 
+0000018061 00000 n 
+0000020433 00000 n 
+0000020581 00000 n 
+0000023087 00000 n 
+0000023235 00000 n 
+0000025939 00000 n 
+0000026087 00000 n 
+0000028590 00000 n 
+0000028738 00000 n 
+0000031263 00000 n 
+0000031411 00000 n 
+0000034866 00000 n 
+0000035014 00000 n 
+0000037376 00000 n 
+0000037524 00000 n 
+0000040274 00000 n 
+0000040422 00000 n 
+0000043192 00000 n 
+0000043340 00000 n 
+0000045902 00000 n 
+0000046050 00000 n 
+0000047068 00000 n 
+trailer
+<< /Size 40 /Root 1 0 R >>
+startxref
+47216
+%%EOF

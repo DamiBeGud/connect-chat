@@ -2,6 +2,11 @@ spring:
   application:
     name: group-service
 
+group:
+  service-client:
+    client-id: ${GROUP_SERVICE_CLIENT_ID:group-service}
+    client-secret: ${GROUP_SERVICE_CLIENT_SECRET:local-group-service-secret}
+
 management:
   endpoints:
     web:

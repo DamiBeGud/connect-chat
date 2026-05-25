@@ -19,6 +19,9 @@ identity:
     chat-service:
       client-id: ${IDENTITY_INTERNAL_CLIENT_CHAT_SERVICE_ID:chat-service}
       client-secret: ${IDENTITY_INTERNAL_CLIENT_CHAT_SERVICE_SECRET}
+    group-service:
+      client-id: ${IDENTITY_INTERNAL_CLIENT_GROUP_SERVICE_ID:group-service}
+      client-secret: ${IDENTITY_INTERNAL_CLIENT_GROUP_SERVICE_SECRET}
   twilio:
     account-sid: ${IDENTITY_TWILIO_ACCOUNT_SID:}
     auth-token: ${IDENTITY_TWILIO_AUTH_TOKEN:}

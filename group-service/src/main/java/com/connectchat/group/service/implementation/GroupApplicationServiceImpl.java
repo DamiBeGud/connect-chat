@@ -4,6 +4,8 @@ import com.connectchat.group.api.request.AddGroupMemberRequest;
 import com.connectchat.group.api.request.CreateGroupRequest;
 import com.connectchat.group.api.response.GroupMemberResponse;
 import com.connectchat.group.api.response.GroupResponse;
+import com.connectchat.group.client.IdentityUserClient;
+import com.connectchat.group.client.IdentityUserResponse;
 import com.connectchat.group.common.error.BadRequestException;
 import com.connectchat.group.common.error.ForbiddenException;
 import com.connectchat.group.common.error.ResourceNotFoundException;
@@ -28,6 +30,7 @@ public class GroupApplicationServiceImpl implements GroupApplicationService {
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
     private final GroupAuthorizationService groupAuthorizationService;
+    private final IdentityUserClient identityUserClient;
 
     @Override
     @Transactional
@@ -66,10 +69,15 @@ public class GroupApplicationServiceImpl implements GroupApplicationService {
         requireGroup(groupId);
         groupAuthorizationService.requireCanManageGroup(caller, groupId);
 
+        IdentityUserResponse user = identityUserClient.getUserByPhoneNumber(
+            request.phoneNumber()
+        );
+        UUID userId = user.userId();
+
         if (
             groupMemberRepository.existsByGroupIdAndUserId(
                 groupId,
-                request.userId()
+                userId
             )
         ) {
             throw new BadRequestException("User is already a group member");
@@ -78,7 +86,7 @@ public class GroupApplicationServiceImpl implements GroupApplicationService {
         GroupMember member = groupMemberRepository.saveAndFlush(
             GroupMember.builder()
                 .groupId(groupId)
-                .userId(request.userId())
+                .userId(userId)
                 .role(GroupMemberRole.MEMBER)
                 .build()
         );

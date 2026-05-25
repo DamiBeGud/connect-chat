@@ -463,9 +463,11 @@ Request:
 
 ```json
 {
-  "userId": "ac9b3a0a-bedb-45bc-975c-9a3b83a6ca09"
+  "phoneNumber": "+15557654321"
 }
 ```
+
+Group-service resolves `phoneNumber` to the member's internal UUID through identity-service before storing the group membership.
 
 Response:
 

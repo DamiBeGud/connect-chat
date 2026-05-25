@@ -24,6 +24,7 @@ data:
   IDENTITY_JWT_SERVICE_TOKEN_EXPIRATION_MS: "14400000"
   IDENTITY_JWT_ISSUER: http://localhost:8081
   IDENTITY_INTERNAL_CLIENT_CHAT_SERVICE_ID: chat-service
+  IDENTITY_INTERNAL_CLIENT_GROUP_SERVICE_ID: group-service
   IDENTITY_SERVICE_BASE_URL: http://identity-service:8081
 
   GROUP_DB_URL: jdbc:postgresql://postgres:5432/group_service
@@ -31,6 +32,7 @@ data:
   GROUP_FLYWAY_ENABLED: "true"
   GROUP_FLYWAY_URL: jdbc:postgresql://postgres:5432/group_service
   GROUP_FLYWAY_USERNAME: postgres
+  GROUP_SERVICE_CLIENT_ID: group-service
 
   CHAT_DB_URL: jdbc:postgresql://postgres:5432/chat_service
   CHAT_DB_USERNAME: postgres
