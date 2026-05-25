@@ -35,5 +35,32 @@ public class CassandraSchemaInitializer {
             ) WITH CLUSTERING ORDER BY (sent_at ASC, message_id ASC)
             """
         );
+        cqlSession.execute(
+            """
+            CREATE TABLE IF NOT EXISTS group_messages_by_id (
+                message_id uuid PRIMARY KEY,
+                group_id uuid,
+                sender_id uuid,
+                content text,
+                sent_at timestamp,
+                updated_at timestamp
+            )
+            """
+        );
+        cqlSession.execute(
+            """
+            CREATE TABLE IF NOT EXISTS undelivered_group_messages_by_recipient (
+                recipient_id uuid,
+                sent_at timestamp,
+                message_id uuid,
+                group_id uuid,
+                sender_id uuid,
+                content text,
+                status text,
+                updated_at timestamp,
+                PRIMARY KEY ((recipient_id), sent_at, message_id)
+            ) WITH CLUSTERING ORDER BY (sent_at ASC, message_id ASC)
+            """
+        );
     }
 }

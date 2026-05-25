@@ -1,9 +1,11 @@
 package com.connectchat.storage;
 
 import com.datastax.oss.driver.api.core.CqlSession;
+import com.connectchat.storage.repository.GroupStoredMessageRepository;
 import com.connectchat.storage.repository.StorageInboxMessageRepository;
 import com.connectchat.storage.repository.StorageStatusInboxMessageRepository;
 import com.connectchat.storage.repository.StoredMessageRepository;
+import com.connectchat.storage.repository.UndeliveredGroupMessageRepository;
 import com.connectchat.storage.repository.UndeliveredMessageRepository;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.junit.jupiter.api.Test;
@@ -37,6 +39,12 @@ class MessageStorageServiceApplicationTests {
 
     @MockitoBean
     UndeliveredMessageRepository undeliveredMessageRepository;
+
+    @MockitoBean
+    GroupStoredMessageRepository groupStoredMessageRepository;
+
+    @MockitoBean
+    UndeliveredGroupMessageRepository undeliveredGroupMessageRepository;
 
     @MockitoBean
     ConnectionFactory connectionFactory;

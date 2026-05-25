@@ -124,4 +124,23 @@ public class GroupController {
             )
         );
     }
+
+    @GetMapping("/{groupId}/member-ids")
+    public ResponseEntity<Response<List<UUID>>> getMemberIds(
+        @AuthenticationPrincipal AuthenticatedCaller caller,
+        @PathVariable UUID groupId
+    ) {
+        List<UUID> memberIds = groupApplicationService.getGroupMemberIds(
+            caller,
+            groupId
+        );
+
+        return ResponseEntity.ok(
+            responseFactory.success(
+                HttpStatus.OK,
+                "Group member ids fetched",
+                memberIds
+            )
+        );
+    }
 }

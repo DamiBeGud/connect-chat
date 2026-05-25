@@ -1,13 +1,18 @@
 package com.connectchat.chat.service.implementation;
 
+import com.connectchat.chat.common.messaging.GroupMessageCommand;
+import com.connectchat.chat.common.messaging.RabbitGroupMessagePublisher;
 import com.connectchat.chat.common.messaging.RabbitPrivateMessagePublisher;
 import com.connectchat.chat.common.messaging.RabbitMessageStatusRequestPublisher;
 import com.connectchat.chat.common.messaging.config.ChatMessagingProperties;
 import com.connectchat.chat.common.messaging.PrivateMessageCommand;
+import com.connectchat.chat.entity.GroupOutboxMessage;
 import com.connectchat.chat.entity.InboxMessage;
 import com.connectchat.chat.entity.MessageStatusInboxEvent;
 import com.connectchat.chat.entity.MessageStatusOutboxEvent;
 import com.connectchat.chat.entity.OutboxMessage;
+import com.connectchat.chat.service.GroupMessageDeliveryService;
+import com.connectchat.chat.service.GroupOutboxService;
 import com.connectchat.chat.service.InboxService;
 import com.connectchat.chat.service.MessageDeliveryService;
 import com.connectchat.chat.service.MessageStatusInboxService;
@@ -31,8 +36,11 @@ public class ChatMessagePipelineService {
 
     private final OutboxService outboxService;
     private final RabbitPrivateMessagePublisher rabbitPrivateMessagePublisher;
+    private final GroupOutboxService groupOutboxService;
+    private final RabbitGroupMessagePublisher rabbitGroupMessagePublisher;
     private final InboxService inboxService;
     private final MessageDeliveryService messageDeliveryService;
+    private final GroupMessageDeliveryService groupMessageDeliveryService;
     private final MessageStatusOutboxService messageStatusOutboxService;
     private final RabbitMessageStatusRequestPublisher rabbitMessageStatusRequestPublisher;
     private final MessageStatusInboxService messageStatusInboxService;
@@ -61,6 +69,38 @@ public class ChatMessagePipelineService {
                 outboxService.markFailed(message.getId(), exception.getMessage()),
             OutboxMessage::getId,
             "Failed to publish outbox message id={}"
+        );
+    }
+
+    @Scheduled(fixedDelayString = "${chat.messaging.outbox-processing-delay:1000}")
+    public void processGroupOutboxMessages() {
+        processBatch(
+            groupOutboxService.claimNextBatch(properties.outboxBatchSize()),
+            message -> {
+                List<UUID> recipientIds = groupOutboxService.recipientIds(
+                    message.getId()
+                );
+                var event = message.toEvent(recipientIds);
+                rabbitGroupMessagePublisher.publish(event);
+                groupMessageDeliveryService.deliver(
+                    new GroupMessageCommand(
+                        event.messageId(),
+                        event.groupId(),
+                        event.senderId(),
+                        event.recipientIds(),
+                        event.content(),
+                        event.occurredAt()
+                    )
+                );
+            },
+            message -> groupOutboxService.markProcessed(message.getId()),
+            (message, exception) ->
+                groupOutboxService.markFailed(
+                    message.getId(),
+                    exception.getMessage()
+                ),
+            GroupOutboxMessage::getId,
+            "Failed to publish group outbox message id={}"
         );
     }
 

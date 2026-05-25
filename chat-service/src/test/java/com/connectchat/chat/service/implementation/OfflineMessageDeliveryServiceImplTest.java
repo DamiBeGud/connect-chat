@@ -51,7 +51,9 @@ class OfflineMessageDeliveryServiceImplTest {
             .thenReturn(
                 List.of(
                     new UndeliveredMessageResponse(
+                        "PRIVATE",
                         messageId,
+                        null,
                         senderId,
                         recipientId,
                         "missed",

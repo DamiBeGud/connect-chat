@@ -2,6 +2,7 @@ package com.connectchat.chat.service.implementation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.connectchat.chat.api.response.GroupMessageResponse;
 import com.connectchat.chat.api.response.PrivateMessageResponse;
 import com.connectchat.chat.api.response.PrivateMessageStatusResponse;
 import com.connectchat.chat.common.messaging.PrivateMessageStatus;
@@ -61,6 +62,29 @@ class WebSocketDeliveryPayloadConverterTest {
         String payload = converter.serialize(response);
         Object decoded = converter.deserialize(
             task(WebSocketDeliveryTaskType.PRIVATE_MESSAGE_STATUS, payload)
+        );
+
+        assertThat(decoded).isEqualTo(response);
+    }
+
+    @Test
+    void serializesAndDeserializesGroupMessagePayloadWithInstant() {
+        UUID messageId = UUID.randomUUID();
+        UUID groupId = UUID.randomUUID();
+        UUID senderId = UUID.randomUUID();
+        Instant sentAt = Instant.parse("2026-05-20T19:26:09Z");
+        GroupMessageResponse response = new GroupMessageResponse(
+            messageId,
+            groupId,
+            senderId,
+            "+49111111111",
+            "hello group",
+            sentAt
+        );
+
+        String payload = converter.serialize(response);
+        Object decoded = converter.deserialize(
+            task(WebSocketDeliveryTaskType.GROUP_MESSAGE, payload)
         );
 
         assertThat(decoded).isEqualTo(response);

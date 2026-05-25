@@ -9,7 +9,9 @@ import com.connectchat.storage.entity.StorageInboxMessage;
 import com.connectchat.storage.entity.StoredMessage;
 import com.connectchat.storage.entity.StoredMessageStatus;
 import com.connectchat.storage.entity.UndeliveredMessage;
+import com.connectchat.storage.repository.GroupStoredMessageRepository;
 import com.connectchat.storage.repository.StoredMessageRepository;
+import com.connectchat.storage.repository.UndeliveredGroupMessageRepository;
 import com.connectchat.storage.repository.UndeliveredMessageRepository;
 import com.connectchat.storage.service.StoredMessageStatusUpdateResult;
 import java.time.Instant;
@@ -23,10 +25,19 @@ class MessageStorageServiceImplTest {
     private final StoredMessageRepository repository = org.mockito.Mockito.mock(
         StoredMessageRepository.class
     );
+    private final GroupStoredMessageRepository groupStoredMessageRepository =
+        org.mockito.Mockito.mock(GroupStoredMessageRepository.class);
     private final UndeliveredMessageRepository undeliveredMessageRepository =
         org.mockito.Mockito.mock(UndeliveredMessageRepository.class);
+    private final UndeliveredGroupMessageRepository undeliveredGroupMessageRepository =
+        org.mockito.Mockito.mock(UndeliveredGroupMessageRepository.class);
     private final MessageStorageServiceImpl service =
-        new MessageStorageServiceImpl(repository, undeliveredMessageRepository);
+        new MessageStorageServiceImpl(
+            repository,
+            groupStoredMessageRepository,
+            undeliveredMessageRepository,
+            undeliveredGroupMessageRepository
+        );
 
     @Test
     void storesMessageFromInboxRow() {
@@ -112,9 +123,12 @@ class MessageStorageServiceImplTest {
         UUID recipientId = UUID.randomUUID();
         when(undeliveredMessageRepository.findByRecipientId(recipientId, 1))
             .thenReturn(List.of());
+        when(undeliveredGroupMessageRepository.findByRecipientId(recipientId, 1))
+            .thenReturn(List.of());
 
         assertThat(service.findUndeliveredMessages(recipientId, 0)).isEmpty();
 
         verify(undeliveredMessageRepository).findByRecipientId(recipientId, 1);
+        verify(undeliveredGroupMessageRepository).findByRecipientId(recipientId, 1);
     }
 }

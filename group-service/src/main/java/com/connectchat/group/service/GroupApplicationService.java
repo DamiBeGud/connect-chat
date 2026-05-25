@@ -33,5 +33,7 @@ public interface GroupApplicationService {
         UUID groupId
     );
 
+    List<UUID> getGroupMemberIds(AuthenticatedCaller caller, UUID groupId);
+
     boolean isMember(UUID groupId, UUID userId);
 }

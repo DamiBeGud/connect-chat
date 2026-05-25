@@ -4,14 +4,19 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.argThat;
 
+import com.connectchat.chat.common.messaging.GroupMessageCommand;
+import com.connectchat.chat.common.messaging.RabbitGroupMessagePublisher;
 import com.connectchat.chat.common.messaging.PrivateMessageCommand;
 import com.connectchat.chat.common.messaging.RabbitMessageStatusRequestPublisher;
 import com.connectchat.chat.common.messaging.RabbitPrivateMessagePublisher;
 import com.connectchat.chat.common.messaging.config.ChatMessagingProperties;
+import com.connectchat.chat.entity.GroupOutboxMessage;
 import com.connectchat.chat.entity.InboxMessage;
 import com.connectchat.chat.entity.MessageStatusInboxEvent;
 import com.connectchat.chat.entity.MessageStatusOutboxEvent;
 import com.connectchat.chat.entity.OutboxMessage;
+import com.connectchat.chat.service.GroupMessageDeliveryService;
+import com.connectchat.chat.service.GroupOutboxService;
 import com.connectchat.chat.service.InboxService;
 import com.connectchat.chat.service.MessageDeliveryService;
 import com.connectchat.chat.service.MessageStatusInboxService;
@@ -30,11 +35,18 @@ class ChatMessagePipelineServiceTest {
     );
     private final RabbitPrivateMessagePublisher rabbitPrivateMessagePublisher =
         org.mockito.Mockito.mock(RabbitPrivateMessagePublisher.class);
+    private final GroupOutboxService groupOutboxService = org.mockito.Mockito.mock(
+        GroupOutboxService.class
+    );
+    private final RabbitGroupMessagePublisher rabbitGroupMessagePublisher =
+        org.mockito.Mockito.mock(RabbitGroupMessagePublisher.class);
     private final InboxService inboxService = org.mockito.Mockito.mock(
         InboxService.class
     );
     private final MessageDeliveryService messageDeliveryService =
         org.mockito.Mockito.mock(MessageDeliveryService.class);
+    private final GroupMessageDeliveryService groupMessageDeliveryService =
+        org.mockito.Mockito.mock(GroupMessageDeliveryService.class);
     private final MessageStatusOutboxService messageStatusOutboxService =
         org.mockito.Mockito.mock(MessageStatusOutboxService.class);
     private final RabbitMessageStatusRequestPublisher rabbitMessageStatusRequestPublisher =
@@ -47,6 +59,8 @@ class ChatMessagePipelineServiceTest {
         "chat.private-message.queue",
         "chat.private-message.exchange",
         "chat.private-message",
+        "chat.group-message.exchange",
+        "chat.group-message",
         "chat.message-status.request.queue",
         "chat.message-status.request.exchange",
         "chat.message-status.request",
@@ -62,8 +76,11 @@ class ChatMessagePipelineServiceTest {
         new ChatMessagePipelineService(
             outboxService,
             rabbitPrivateMessagePublisher,
+            groupOutboxService,
+            rabbitGroupMessagePublisher,
             inboxService,
             messageDeliveryService,
+            groupMessageDeliveryService,
             messageStatusOutboxService,
             rabbitMessageStatusRequestPublisher,
             messageStatusInboxService,
@@ -102,6 +119,48 @@ class ChatMessagePipelineServiceTest {
             )
         );
         verify(outboxService).markProcessed(outboxMessage.getId());
+    }
+
+    @Test
+    void publishesClaimedGroupOutboxMessagesToRabbit() {
+        UUID messageId = UUID.randomUUID();
+        UUID recipientId = UUID.randomUUID();
+        GroupOutboxMessage outboxMessage = GroupOutboxMessage.builder()
+            .id(messageId)
+            .groupId(UUID.randomUUID())
+            .senderId(UUID.randomUUID())
+            .content("hello group")
+            .build();
+        when(groupOutboxService.claimNextBatch(5)).thenReturn(
+            List.of(outboxMessage)
+        );
+        when(groupOutboxService.recipientIds(messageId)).thenReturn(
+            List.of(recipientId)
+        );
+
+        service.processGroupOutboxMessages();
+
+        verify(rabbitGroupMessagePublisher).publish(
+            argThat(event ->
+                event.messageId().equals(outboxMessage.getId()) &&
+                event.groupId().equals(outboxMessage.getGroupId()) &&
+                event.senderId().equals(outboxMessage.getSenderId()) &&
+                event.recipientIds().equals(List.of(recipientId)) &&
+                event.content().equals(outboxMessage.getContent()) &&
+                event.occurredAt() != null
+            )
+        );
+        verify(groupMessageDeliveryService).deliver(
+            argThat(command ->
+                command.messageId().equals(outboxMessage.getId()) &&
+                command.groupId().equals(outboxMessage.getGroupId()) &&
+                command.senderId().equals(outboxMessage.getSenderId()) &&
+                command.recipientIds().equals(List.of(recipientId)) &&
+                command.content().equals(outboxMessage.getContent()) &&
+                command.occurredAt() != null
+            )
+        );
+        verify(groupOutboxService).markProcessed(outboxMessage.getId());
     }
 
     @Test

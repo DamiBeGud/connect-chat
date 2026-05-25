@@ -7,6 +7,8 @@ public record ChatMessagingProperties(
     String privateMessageQueue,
     String privateMessageExchange,
     String privateMessageRoutingKey,
+    String groupMessageExchange,
+    String groupMessageRoutingKey,
     String statusRequestQueue,
     String statusRequestExchange,
     String statusRequestRoutingKey,

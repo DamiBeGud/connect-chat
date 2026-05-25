@@ -13,6 +13,8 @@ chat:
     private-message-queue: ${CHAT_PRIVATE_MESSAGE_QUEUE:chat.private-message.queue}
     private-message-exchange: ${CHAT_PRIVATE_MESSAGE_EXCHANGE:chat.private-message.exchange}
     private-message-routing-key: ${CHAT_PRIVATE_MESSAGE_ROUTING_KEY:chat.private-message}
+    group-message-exchange: ${CHAT_GROUP_MESSAGE_EXCHANGE:chat.group-message.exchange}
+    group-message-routing-key: ${CHAT_GROUP_MESSAGE_ROUTING_KEY:chat.group-message}
     status-request-queue: ${CHAT_STATUS_REQUEST_QUEUE:chat.message-status.request.queue}
     status-request-exchange: ${CHAT_STATUS_REQUEST_EXCHANGE:chat.message-status.request.exchange}
     status-request-routing-key: ${CHAT_STATUS_REQUEST_ROUTING_KEY:chat.message-status.request}
@@ -41,6 +43,10 @@ presence:
 message-storage:
   service:
     base-url: ${MESSAGE_STORAGE_SERVICE_BASE_URL:http://localhost:8084}
+
+group:
+  service:
+    base-url: ${GROUP_SERVICE_BASE_URL:http://localhost:8082}
 
 identity:
   service:

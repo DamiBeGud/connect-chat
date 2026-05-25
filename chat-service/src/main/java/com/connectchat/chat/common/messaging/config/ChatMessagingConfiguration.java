@@ -44,6 +44,11 @@ public class ChatMessagingConfiguration {
     }
 
     @Bean
+    DirectExchange groupMessageExchange(ChatMessagingProperties properties) {
+        return exchange(properties.groupMessageExchange());
+    }
+
+    @Bean
     DirectExchange statusRequestExchange(ChatMessagingProperties properties) {
         return exchange(properties.statusRequestExchange());
     }

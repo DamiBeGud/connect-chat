@@ -2,6 +2,7 @@ package com.connectchat.chat.service.implementation;
 
 import com.connectchat.chat.api.response.PrivateMessageResponse;
 import com.connectchat.chat.api.response.PrivateMessageStatusResponse;
+import com.connectchat.chat.api.response.GroupMessageResponse;
 import com.connectchat.chat.entity.WebSocketDeliveryTask;
 import com.connectchat.chat.entity.WebSocketDeliveryTaskType;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -45,6 +46,7 @@ public class WebSocketDeliveryPayloadConverter {
         return switch (type) {
             case PRIVATE_MESSAGE -> PrivateMessageResponse.class;
             case PRIVATE_MESSAGE_STATUS -> PrivateMessageStatusResponse.class;
+            case GROUP_MESSAGE -> GroupMessageResponse.class;
         };
     }
 }

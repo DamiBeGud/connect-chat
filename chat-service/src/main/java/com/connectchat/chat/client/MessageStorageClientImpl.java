@@ -1,6 +1,8 @@
 package com.connectchat.chat.client;
 
+import com.connectchat.chat.client.request.GroupMessageStatusUpdateRequest;
 import com.connectchat.chat.client.response.UndeliveredMessageResponse;
+import com.connectchat.chat.common.messaging.PrivateMessageStatus;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -47,5 +49,23 @@ public class MessageStorageClientImpl implements MessageStorageClient {
         }
 
         return response;
+    }
+
+    @Override
+    public void updateGroupMessageStatus(
+        UUID messageId,
+        UUID recipientId,
+        PrivateMessageStatus status
+    ) {
+        messageStorageRestClient
+            .post()
+            .uri(
+                "/api/v1/messages/group/{messageId}/recipients/{recipientId}/status",
+                messageId,
+                recipientId
+            )
+            .body(new GroupMessageStatusUpdateRequest(status))
+            .retrieve()
+            .toBodilessEntity();
     }
 }

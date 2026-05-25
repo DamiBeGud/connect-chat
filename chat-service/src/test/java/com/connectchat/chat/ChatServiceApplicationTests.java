@@ -1,5 +1,7 @@
 package com.connectchat.chat;
 
+import com.connectchat.chat.repository.GroupOutboxMessageRepository;
+import com.connectchat.chat.repository.GroupOutboxRecipientRepository;
 import com.connectchat.chat.repository.InboxMessageRepository;
 import com.connectchat.chat.repository.MessageStatusInboxEventRepository;
 import com.connectchat.chat.repository.MessageStatusOutboxEventRepository;
@@ -34,6 +36,12 @@ class ChatServiceApplicationTests {
 
     @MockitoBean
     MessageStatusInboxEventRepository messageStatusInboxEventRepository;
+
+    @MockitoBean
+    GroupOutboxMessageRepository groupOutboxMessageRepository;
+
+    @MockitoBean
+    GroupOutboxRecipientRepository groupOutboxRecipientRepository;
 
     @MockitoBean
     WebSocketDeliveryTaskRepository webSocketDeliveryTaskRepository;

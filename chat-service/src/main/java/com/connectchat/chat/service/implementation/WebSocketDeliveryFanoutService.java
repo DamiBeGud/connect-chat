@@ -1,5 +1,6 @@
 package com.connectchat.chat.service.implementation;
 
+import com.connectchat.chat.api.response.GroupMessageResponse;
 import com.connectchat.chat.api.response.PrivateMessageResponse;
 import com.connectchat.chat.api.response.PrivateMessageStatusResponse;
 import com.connectchat.chat.client.PresenceClient;
@@ -26,6 +27,8 @@ public class WebSocketDeliveryFanoutService {
 
     public static final String PRIVATE_MESSAGES_DESTINATION =
         "/queue/private-messages";
+    public static final String GROUP_MESSAGES_DESTINATION =
+        "/queue/group-messages";
     public static final String PRIVATE_MESSAGE_STATUS_DESTINATION =
         "/queue/private-message-status";
 
@@ -58,6 +61,40 @@ public class WebSocketDeliveryFanoutService {
             .targetSessionId(sessionId)
             .targetInstanceId(instanceId)
             .destination(PRIVATE_MESSAGES_DESTINATION)
+            .payload(payloadConverter.serialize(response))
+            .expiresAt(expiresAt)
+            .build();
+
+        return deliveryTaskService.createTasks(List.of(task));
+    }
+
+    public int createGroupMessageTasks(
+        GroupMessageResponse response,
+        List<UUID> targetUserIds
+    ) {
+        return createTasksForActiveSessions(
+            response.messageId(),
+            WebSocketDeliveryTaskType.GROUP_MESSAGE,
+            targetUserIds,
+            GROUP_MESSAGES_DESTINATION,
+            payloadConverter.serialize(response)
+        );
+    }
+
+    public int createGroupMessageTaskForSession(
+        GroupMessageResponse response,
+        UUID targetUserId,
+        String sessionId,
+        String instanceId
+    ) {
+        Instant expiresAt = Instant.now(clock).plus(properties.taskTtl());
+        WebSocketDeliveryTask task = WebSocketDeliveryTask.builder()
+            .sourceEventId(response.messageId())
+            .type(WebSocketDeliveryTaskType.GROUP_MESSAGE)
+            .targetUserId(targetUserId)
+            .targetSessionId(sessionId)
+            .targetInstanceId(instanceId)
+            .destination(GROUP_MESSAGES_DESTINATION)
             .payload(payloadConverter.serialize(response))
             .expiresAt(expiresAt)
             .build();

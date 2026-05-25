@@ -17,6 +17,8 @@ class RabbitPrivateMessagePublisherTest {
         "chat.private-message.queue",
         "chat.private-message.exchange",
         "chat.private-message",
+        "chat.group-message.exchange",
+        "chat.group-message",
         "chat.message-status.request.queue",
         "chat.message-status.request.exchange",
         "chat.message-status.request",

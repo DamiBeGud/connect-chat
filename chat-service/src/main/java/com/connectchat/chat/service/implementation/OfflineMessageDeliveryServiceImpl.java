@@ -1,5 +1,6 @@
 package com.connectchat.chat.service.implementation;
 
+import com.connectchat.chat.api.response.GroupMessageResponse;
 import com.connectchat.chat.api.response.PrivateMessageResponse;
 import com.connectchat.chat.client.IdentityUserClient;
 import com.connectchat.chat.client.MessageStorageClient;
@@ -36,11 +37,20 @@ public class OfflineMessageDeliveryServiceImpl
             IdentityUserResponse sender = identityUserClient.getUserById(
                 message.senderId()
             );
-            fanoutService.createPrivateMessageTaskForSession(
-                toPrivateMessageResponse(message, sender),
-                sessionId,
-                chatInstanceInfo.getInstanceId()
-            );
+            if ("GROUP".equals(message.messageType())) {
+                fanoutService.createGroupMessageTaskForSession(
+                    toGroupMessageResponse(message, sender),
+                    userId,
+                    sessionId,
+                    chatInstanceInfo.getInstanceId()
+                );
+            } else {
+                fanoutService.createPrivateMessageTaskForSession(
+                    toPrivateMessageResponse(message, sender),
+                    sessionId,
+                    chatInstanceInfo.getInstanceId()
+                );
+            }
         }
     }
 
@@ -74,6 +84,20 @@ public class OfflineMessageDeliveryServiceImpl
             message.senderId(),
             sender.phoneNumber(),
             message.recipientId(),
+            message.content(),
+            message.sentAt()
+        );
+    }
+
+    private GroupMessageResponse toGroupMessageResponse(
+        UndeliveredMessageResponse message,
+        IdentityUserResponse sender
+    ) {
+        return new GroupMessageResponse(
+            message.messageId(),
+            message.groupId(),
+            message.senderId(),
+            sender.phoneNumber(),
             message.content(),
             message.sentAt()
         );

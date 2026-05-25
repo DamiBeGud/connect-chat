@@ -650,6 +650,25 @@ Payload received:
 }
 ```
 
+Subscribe to group messages:
+
+```text
+/user/queue/group-messages
+```
+
+Payload received:
+
+```json
+{
+  "messageId": "6ce38820-66ed-4a68-86a7-9b3677eea8ed",
+  "groupId": "9d46599f-27cb-4d2b-8d3b-4fffce6773d3",
+  "senderId": "793de6b4-7ced-4a80-80c7-dd22d9b90a72",
+  "senderPhoneNumber": "+15551234567",
+  "content": "Hello group",
+  "sentAt": "2026-05-19T13:30:00.000000Z"
+}
+```
+
 Status values:
 
 | Status | Meaning |
@@ -725,6 +744,68 @@ Body:
 ```json
 {
   "messageId": "42fa8a65-a118-49c9-bd50-0ff96116d0e8"
+}
+```
+
+### Send Group Message
+
+Only group members can send group messages. The sender is not included in the recipient delivery snapshot; other group members receive the message on `/user/queue/group-messages`.
+
+Destination:
+
+```text
+/app/chat.group
+```
+
+Body:
+
+```json
+{
+  "groupId": "9d46599f-27cb-4d2b-8d3b-4fffce6773d3",
+  "content": "Hello group"
+}
+```
+
+Validation:
+
+| Field | Required | Rule |
+| --- | --- | --- |
+| `groupId` | yes | UUID |
+| `content` | yes | not blank, max 4000 chars |
+
+### Acknowledge Group Delivered
+
+Only a recipient from the message's send-time recipient snapshot can acknowledge `DELIVERED`.
+
+Destination:
+
+```text
+/app/chat.group.delivered
+```
+
+Body:
+
+```json
+{
+  "messageId": "6ce38820-66ed-4a68-86a7-9b3677eea8ed"
+}
+```
+
+### Acknowledge Group Read
+
+Only a recipient from the message's send-time recipient snapshot can acknowledge `READ`.
+
+Destination:
+
+```text
+/app/chat.group.read
+```
+
+Body:
+
+```json
+{
+  "messageId": "6ce38820-66ed-4a68-86a7-9b3677eea8ed"
 }
 ```
 
@@ -1001,7 +1082,9 @@ Response:
 ```json
 [
   {
+    "messageType": "PRIVATE",
     "messageId": "42fa8a65-a118-49c9-bd50-0ff96116d0e8",
+    "groupId": null,
     "senderId": "793de6b4-7ced-4a80-80c7-dd22d9b90a72",
     "recipientId": "ac9b3a0a-bedb-45bc-975c-9a3b83a6ca09",
     "content": "Hello World",
@@ -1011,7 +1094,7 @@ Response:
 ]
 ```
 
-Only messages still pending recipient acknowledgement are returned. Once the recipient publishes `DELIVERED` or `READ`, message-storage-service removes the message from the undelivered lookup.
+`messageType` is `PRIVATE` or `GROUP`. Group messages include `groupId`; private messages have `groupId: null`. Only messages still pending recipient acknowledgement are returned. Once the recipient publishes `DELIVERED` or `READ`, message-storage-service removes the message from the relevant undelivered lookup.
 
 ## Health Endpoints
 
@@ -1057,6 +1140,8 @@ curl "http://localhost:8085/actuator/health"
 5. Connect to chat WebSocket with `Authorization: Bearer <accessToken>`.
 6. Subscribe to `/user/queue/private-messages`.
 7. Subscribe to `/user/queue/private-message-status`.
-8. Send private messages to `/app/chat.private` with `recipientPhoneNumber`.
-9. When receiving a live or replayed message as recipient, publish delivered/read acknowledgements.
-10. Refresh tokens with `POST /identity/auth/token/refresh` before or after access token expiration.
+8. Subscribe to `/user/queue/group-messages`.
+9. Send private messages to `/app/chat.private` with `recipientPhoneNumber`.
+10. Send group messages to `/app/chat.group` with `groupId`.
+11. When receiving a live or replayed message as recipient, publish delivered/read acknowledgements.
+12. Refresh tokens with `POST /identity/auth/token/refresh` before or after access token expiration.

@@ -31,3 +31,7 @@ presence:
 message-storage:
   service:
     base-url: ${MESSAGE_STORAGE_SERVICE_BASE_URL:http://message-storage-service:8084}
+
+group:
+  service:
+    base-url: ${GROUP_SERVICE_BASE_URL:http://group-service:8082}

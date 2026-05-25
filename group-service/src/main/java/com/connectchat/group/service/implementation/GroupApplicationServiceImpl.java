@@ -135,6 +135,22 @@ public class GroupApplicationServiceImpl implements GroupApplicationService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<UUID> getGroupMemberIds(
+        AuthenticatedCaller caller,
+        UUID groupId
+    ) {
+        requireGroup(groupId);
+        groupAuthorizationService.requireCanViewMembers(caller, groupId);
+
+        return groupMemberRepository
+            .findByGroupIdOrderByCreatedAtAsc(groupId)
+            .stream()
+            .map(GroupMember::getUserId)
+            .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public boolean isMember(UUID groupId, UUID userId) {
         return groupMemberRepository.existsByGroupIdAndUserId(groupId, userId);
     }

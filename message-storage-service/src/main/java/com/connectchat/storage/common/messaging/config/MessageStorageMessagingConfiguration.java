@@ -23,6 +23,11 @@ public class MessageStorageMessagingConfiguration {
     }
 
     @Bean
+    Queue groupMessageQueue(MessageStorageMessagingProperties properties) {
+        return queue(properties.groupMessageQueue());
+    }
+
+    @Bean
     Queue statusRequestQueue(MessageStorageMessagingProperties properties) {
         return queue(properties.statusRequestQueue());
     }
@@ -32,6 +37,13 @@ public class MessageStorageMessagingConfiguration {
         MessageStorageMessagingProperties properties
     ) {
         return exchange(properties.privateMessageExchange());
+    }
+
+    @Bean
+    DirectExchange groupMessageExchange(
+        MessageStorageMessagingProperties properties
+    ) {
+        return exchange(properties.groupMessageExchange());
     }
 
     @Bean
@@ -58,6 +70,19 @@ public class MessageStorageMessagingConfiguration {
             privateMessageQueue,
             privateMessageExchange,
             properties.privateMessageRoutingKey()
+        );
+    }
+
+    @Bean
+    Binding groupMessageBinding(
+        Queue groupMessageQueue,
+        DirectExchange groupMessageExchange,
+        MessageStorageMessagingProperties properties
+    ) {
+        return binding(
+            groupMessageQueue,
+            groupMessageExchange,
+            properties.groupMessageRoutingKey()
         );
     }
 

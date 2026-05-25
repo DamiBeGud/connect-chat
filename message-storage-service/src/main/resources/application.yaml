@@ -7,6 +7,9 @@ message-storage:
     private-message-queue: ${MESSAGE_STORAGE_PRIVATE_MESSAGE_QUEUE:message-storage.private-message.queue}
     private-message-exchange: ${MESSAGE_STORAGE_PRIVATE_MESSAGE_EXCHANGE:chat.private-message.exchange}
     private-message-routing-key: ${MESSAGE_STORAGE_PRIVATE_MESSAGE_ROUTING_KEY:chat.private-message}
+    group-message-queue: ${MESSAGE_STORAGE_GROUP_MESSAGE_QUEUE:message-storage.group-message.queue}
+    group-message-exchange: ${MESSAGE_STORAGE_GROUP_MESSAGE_EXCHANGE:chat.group-message.exchange}
+    group-message-routing-key: ${MESSAGE_STORAGE_GROUP_MESSAGE_ROUTING_KEY:chat.group-message}
     status-request-queue: ${MESSAGE_STORAGE_STATUS_REQUEST_QUEUE:message-storage.message-status.request.queue}
     status-request-exchange: ${MESSAGE_STORAGE_STATUS_REQUEST_EXCHANGE:chat.message-status.request.exchange}
     status-request-routing-key: ${MESSAGE_STORAGE_STATUS_REQUEST_ROUTING_KEY:chat.message-status.request}
