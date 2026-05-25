@@ -658,6 +658,8 @@ Status values:
 | `DELIVERED` | Recipient acknowledged receiving the message. |
 | `READ` | Recipient acknowledged reading the message. |
 
+On reconnect, chat-service automatically checks message-storage-service for private messages that are still `SENT` for the reconnecting user. Any missed messages are pushed to the reconnecting WebSocket session on `/user/queue/private-messages`; the mobile client should handle them the same way as live messages and publish `DELIVERED` after receipt.
+
 ### Send Private Message
 
 Destination:
@@ -982,9 +984,34 @@ Response:
 
 ## Message Storage Service
 
-Message-storage-service currently has no mobile-facing REST API.
+Message-storage-service has no mobile-facing REST API.
 
 It consumes RabbitMQ events from chat-service and stores private messages/status updates. Mobile clients receive messages and statuses through chat-service WebSocket subscriptions.
+
+### Get Undelivered Messages
+
+Internal only. Mobile clients should not call this endpoint. Chat-service calls it when a user reconnects so pending messages can be pushed over the user's WebSocket session.
+
+```http
+GET /api/v1/messages/users/{userId}/undelivered?limit=50
+```
+
+Response:
+
+```json
+[
+  {
+    "messageId": "42fa8a65-a118-49c9-bd50-0ff96116d0e8",
+    "senderId": "793de6b4-7ced-4a80-80c7-dd22d9b90a72",
+    "recipientId": "ac9b3a0a-bedb-45bc-975c-9a3b83a6ca09",
+    "content": "Hello World",
+    "status": "SENT",
+    "sentAt": "2026-05-19T13:30:00.000000Z"
+  }
+]
+```
+
+Only messages still pending recipient acknowledgement are returned. Once the recipient publishes `DELIVERED` or `READ`, message-storage-service removes the message from the undelivered lookup.
 
 ## Health Endpoints
 
@@ -1031,5 +1058,5 @@ curl "http://localhost:8085/actuator/health"
 6. Subscribe to `/user/queue/private-messages`.
 7. Subscribe to `/user/queue/private-message-status`.
 8. Send private messages to `/app/chat.private` with `recipientPhoneNumber`.
-9. When receiving a message as recipient, publish delivered/read acknowledgements.
+9. When receiving a live or replayed message as recipient, publish delivered/read acknowledgements.
 10. Refresh tokens with `POST /identity/auth/token/refresh` before or after access token expiration.
