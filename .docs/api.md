@@ -50,6 +50,9 @@ export CHAT_WS_URL="ws://dev0:30083/ws/chat"
 # export GROUP_BASE_URL="http://localhost:8082"
 # export CHAT_HTTP_BASE_URL="http://localhost:8083"
 # export CHAT_WS_URL="ws://localhost:8083/ws/chat"
+
+# AI bot contact, if enabled in the backend environment
+export AI_BOT_PHONE_NUMBER="+10000000000"
 ```
 
 ## Common Conventions
@@ -711,6 +714,82 @@ Notes:
 - The message is eventually delivered to both sender and recipient on `/user/queue/private-messages`.
 - The message is also stored asynchronously by message-storage-service.
 
+### Send Message To AI Bot
+
+The AI bot behaves like a normal private chat participant. The mobile client does not call `ai-service` directly and must not send Google API keys to the client. To start or continue a bot conversation, send a normal private message to the configured bot phone number.
+
+Default local bot contact:
+
+| Field | Value |
+| --- | --- |
+| Bot phone number | `+10000000000` |
+| Bot user id | `00000000-0000-0000-0000-000000000001` |
+
+Destination:
+
+```text
+/app/chat.private
+```
+
+Body:
+
+```json
+{
+  "recipientPhoneNumber": "+10000000000",
+  "content": "Can you summarize my last idea?"
+}
+```
+
+Frontend flow:
+
+1. Show the AI bot as a normal contact or pinned chat using `AI_BOT_PHONE_NUMBER`.
+2. Connect to `$CHAT_WS_URL` with the user's access token.
+3. Subscribe to `/user/queue/private-messages` and `/user/queue/private-message-status`.
+4. Send the user's prompt to `/app/chat.private` with `recipientPhoneNumber` set to the bot phone number.
+5. Render the user's prompt when it arrives on `/user/queue/private-messages`, the same as any other private message.
+6. Render the AI reply when a later private message arrives with `senderId` equal to the bot user id or `senderPhoneNumber` equal to the bot phone number.
+7. Publish `DELIVERED` and `READ` acknowledgements for AI replies exactly as you would for messages from a human.
+
+Example AI reply payload received on `/user/queue/private-messages`:
+
+```json
+{
+  "messageId": "7b1ef93d-5d0e-4325-8c5d-99ed0a2fb5f3",
+  "senderId": "00000000-0000-0000-0000-000000000001",
+  "senderPhoneNumber": "+10000000000",
+  "recipientId": "793de6b4-7ced-4a80-80c7-dd22d9b90a72",
+  "content": "Here is a concise summary...",
+  "sentAt": "2026-05-27T18:30:00.000000Z"
+}
+```
+
+Frontend helper:
+
+```js
+const AI_BOT_PHONE_NUMBER = "+10000000000";
+
+function sendAiBotMessage(content) {
+  client.publish({
+    destination: "/app/chat.private",
+    body: JSON.stringify({
+      recipientPhoneNumber: AI_BOT_PHONE_NUMBER,
+      content,
+    }),
+    headers: { "content-type": "application/json" },
+  });
+}
+
+function isAiBotMessage(message) {
+  return message.senderPhoneNumber === AI_BOT_PHONE_NUMBER;
+}
+```
+
+Operational notes:
+
+- The bot phone number must exist as a real identity-service user. If it does not, the private message send will fail during recipient phone-number resolution.
+- AI replies may arrive with a delay because chat-service saves the user's message, the Python service calls Google AI, and chat-service then saves the reply as a second private message.
+- There is no separate typing indicator or conversation-history API for the bot in the current version.
+
 ### Acknowledge Delivered
 
 Only the recipient can acknowledge `DELIVERED`.
@@ -851,6 +930,10 @@ function sendMessage(recipientPhoneNumber, content) {
     body: JSON.stringify({ recipientPhoneNumber, content }),
     headers: { "content-type": "application/json" },
   });
+}
+
+function sendAiBotMessage(content) {
+  sendMessage("+10000000000", content);
 }
 
 function markRead(messageId) {
