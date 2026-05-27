@@ -740,6 +740,17 @@ Body:
 }
 ```
 
+RideAndPark parking prompts use the same client-facing chat API. The client still sends a normal private message to the AI bot; it does not call the RideAndPark backend or MCP server directly.
+
+Example parking prompt:
+
+```json
+{
+  "recipientPhoneNumber": "+10000000000",
+  "content": "Find me free parking spots near Stuttgart hauptbahnhof"
+}
+```
+
 Frontend flow:
 
 1. Show the AI bot as a normal contact or pinned chat using `AI_BOT_PHONE_NUMBER`.
@@ -749,6 +760,91 @@ Frontend flow:
 5. Render the user's prompt when it arrives on `/user/queue/private-messages`, the same as any other private message.
 6. Render the AI reply when a later private message arrives with `senderId` equal to the bot user id or `senderPhoneNumber` equal to the bot phone number.
 7. Publish `DELIVERED` and `READ` acknowledgements for AI replies exactly as you would for messages from a human.
+
+#### RideAndPark MCP Tool Flow
+
+When RideAndPark tooling is enabled in `ai-service`, parking-related AI bot prompts are handled server-side through the RideAndPark MCP integration:
+
+```text
+mobile client
+-> /app/chat.private
+-> chat-service
+-> RabbitMQ bot inbox
+-> ai-service
+-> ride-and-park-mcp-server
+-> ride-and-park-backend
+-> ai-service formatted reply
+-> RabbitMQ AI reply
+-> chat-service
+-> /user/queue/private-messages
+```
+
+Current parking intent matching is conservative and looks for parking terms such as `parking`, `parkhaus`, `garage`, `free spaces`, `parkplätze`, or `parken`. Non-parking prompts continue to use the normal Gemini response path.
+
+For parking prompts, `ai-service` extracts a destination from the user text, then calls the MCP tool:
+
+```text
+find_parkings_near_destination(destination, radius_km=5, only_open=true, limit=5)
+```
+
+The MCP server geocodes the destination through `ride-and-park-backend`, fetches nearby open parking records, calculates `distanceKm` when parking coordinates are available, ranks useful results first, and returns at most five options.
+
+Ranking currently prefers:
+
+1. `status === "open"`
+2. higher `free` spaces
+3. lower `occupancyRate`
+4. realtime data when otherwise similar
+
+The final user-facing bot reply is formatted deterministically by `ai-service` from the MCP tool output. The LLM must not invent parking availability, prices, addresses, or walking times. If RideAndPark returns no results, the bot says no open parking options were found. If the MCP/backend call fails, the bot says parking data is temporarily unavailable.
+
+Parking replies may include these lines when fields are present:
+
+| Line | Source |
+| --- | --- |
+| Parking name | RideAndPark parking record |
+| Free spaces | `free` and `total` |
+| Occupancy | `occupancyRate` |
+| Status | `status` |
+| Distance | calculated from destination coordinates and parking coordinates |
+| Directions | Google Maps URL built from parking `lat` and `lng` |
+| Opening hours | `openingHours` |
+| Updated | `updatedAt` |
+| Warning | backend `meta.warning` |
+
+The directions URL is included only when the parking result has coordinates:
+
+```text
+https://www.google.com/maps/dir/?api=1&destination=LATITUDE,LONGITUDE
+```
+
+Example RideAndPark AI reply content:
+
+```text
+Here are the best open parking options near Stuttgart Hauptbahnhof:
+
+1. LBBW (Hbf.)
+   Free spaces: 1109 of 1290
+   Occupancy: 14%
+   Status: open
+   Distance: 0.25 km
+   Directions: https://www.google.com/maps/dir/?api=1&destination=48.78641,9.18117
+   Opening hours: 24/7
+   Updated: 2026-05-27 22:27
+
+2. Galeria Kaufhof (Unt. Königstr.)
+   Free spaces: 532 of 600
+   Occupancy: 11.3%
+   Status: open
+   Distance: 0.28 km
+   Directions: https://www.google.com/maps/dir/?api=1&destination=48.7821,9.18017
+   Opening hours: 24/7
+   Updated: 2026-05-27 22:27
+
+Availability can change quickly, so check again before driving.
+```
+
+Client handling does not need to change for this feature. The reply arrives as normal private-message `content`; render it as plain text and preserve line breaks where possible.
 
 Example AI reply payload received on `/user/queue/private-messages`:
 

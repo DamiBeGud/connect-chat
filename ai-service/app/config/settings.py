@@ -23,3 +23,8 @@ class Settings(BaseSettings):
 
     google_api_key: str = ""
     google_model: str = "gemini-2.5-flash"
+
+    ride_and_park_mcp_url: str = "http://ride-and-park-mcp-server:8080"
+    ai_tool_timeout_seconds: float = 10
+    ai_parking_result_limit: int = 5
+    ai_enable_ride_and_park_tools: bool = True

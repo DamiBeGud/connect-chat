@@ -1,8 +1,7 @@
+mcp
 fastapi
 uvicorn
-pika
+httpx
 pydantic
 pydantic-settings
-google-genai
-httpx
 pytest
