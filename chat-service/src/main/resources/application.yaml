@@ -26,6 +26,13 @@ chat:
     inbox-batch-size: ${CHAT_INBOX_BATCH_SIZE:50}
     outbox-processing-delay: ${CHAT_OUTBOX_PROCESSING_DELAY:1000}
     inbox-processing-delay: ${CHAT_INBOX_PROCESSING_DELAY:1000}
+  ai:
+    bot-user-id: ${AI_BOT_USER_ID:00000000-0000-0000-0000-000000000001}
+    bot-inbox-exchange: ${CHAT_BOT_INBOX_EXCHANGE:chat.bot-inbox.exchange}
+    bot-inbox-routing-key: ${CHAT_BOT_INBOX_ROUTING_KEY:chat.bot-inbox}
+    ai-reply-command-queue: ${CHAT_AI_REPLY_COMMAND_QUEUE:chat.ai-reply.commands}
+    ai-reply-exchange: ${CHAT_AI_REPLY_EXCHANGE:chat.ai-reply.exchange}
+    ai-reply-routing-key: ${CHAT_AI_REPLY_ROUTING_KEY:chat.ai-reply}
   websocket-delivery:
     batch-size: ${CHAT_WEBSOCKET_DELIVERY_BATCH_SIZE:50}
     processing-delay: ${CHAT_WEBSOCKET_DELIVERY_PROCESSING_DELAY:500}

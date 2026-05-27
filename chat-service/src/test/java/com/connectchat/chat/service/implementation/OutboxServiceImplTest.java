@@ -2,6 +2,7 @@ package com.connectchat.chat.service.implementation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -23,12 +24,22 @@ class OutboxServiceImplTest {
     void enqueuesPendingOutboxMessage() {
         UUID senderId = UUID.randomUUID();
         UUID recipientId = UUID.randomUUID();
+        doAnswer(invocation -> invocation.getArgument(0))
+            .when(repository)
+            .save(any(OutboxMessage.class));
 
-        service.enqueuePrivateMessage(senderId, recipientId, "hello");
+        OutboxMessage saved = service.enqueuePrivateMessage(
+            senderId,
+            recipientId,
+            "hello"
+        );
 
         verify(repository).save(
             any(OutboxMessage.class)
         );
+        assertThat(saved.getSenderId()).isEqualTo(senderId);
+        assertThat(saved.getRecipientId()).isEqualTo(recipientId);
+        assertThat(saved.getContent()).isEqualTo("hello");
     }
 
     @Test

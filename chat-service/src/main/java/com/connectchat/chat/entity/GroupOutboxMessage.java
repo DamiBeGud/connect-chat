@@ -1,5 +1,6 @@
 package com.connectchat.chat.entity;
 
+import com.connectchat.chat.common.MessageContentLimits;
 import com.connectchat.chat.common.messaging.GroupMessageEvent;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,7 +38,11 @@ public class GroupOutboxMessage {
     @Column(name = "sender_id", nullable = false, updatable = false)
     private UUID senderId;
 
-    @Column(nullable = false, length = 4_000, updatable = false)
+    @Column(
+        nullable = false,
+        length = MessageContentLimits.MAX_LENGTH,
+        updatable = false
+    )
     private String content;
 
     @Builder.Default

@@ -1,5 +1,6 @@
 package com.connectchat.storage.entity;
 
+import com.connectchat.storage.common.MessageContentLimits;
 import com.connectchat.storage.common.messaging.PrivateMessageEvent;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -39,7 +40,11 @@ public class StorageInboxMessage {
     @Column(name = "recipient_id", nullable = false, updatable = false)
     private UUID recipientId;
 
-    @Column(nullable = false, length = 4_000, updatable = false)
+    @Column(
+        nullable = false,
+        length = MessageContentLimits.MAX_LENGTH,
+        updatable = false
+    )
     private String content;
 
     @Column(name = "event_occurred_at")

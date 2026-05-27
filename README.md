@@ -29,6 +29,7 @@ The local stack starts:
 - Redis
 - Cassandra
 - RabbitMQ
+- AI service
 
 Run:
 
@@ -99,6 +100,15 @@ Default local ports:
 - `chat-service`: `8083`
 - `message-storage-service`: `8084`
 - `presence-service`: `8085`
+
+### AI Bot Setup
+
+The AI bot is addressed through normal private messaging, so the configured `AI_BOT_PHONE_NUMBER` must resolve to a real identity-service user. Identity-service Flyway migration `V7__seed_ai_bot_user.sql` seeds the default bot user:
+
+- `AI_BOT_USER_ID`: `00000000-0000-0000-0000-000000000001`
+- `AI_BOT_PHONE_NUMBER`: `+10000000000`
+
+Set `GOOGLE_API_KEY` in your local environment before using the bot. The Python service consumes only `BotMessageCommand` messages from its bot inbox queue and sends replies back to chat-service as `AiPrivateReplyCommand`; chat-service remains responsible for creating the final private message outbox row.
 
 ### Zed Tasks
 

@@ -98,6 +98,28 @@ services:
       timeout: 5s
       retries: 10
 
+  ai-service:
+    build: ./ai-service
+    container_name: connect-chat-ai-service
+    restart: unless-stopped
+    environment:
+      AI_BOT_USER_ID: ${AI_BOT_USER_ID}
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: ${CHAT_RABBITMQ_USERNAME}
+      RABBITMQ_PASSWORD: ${CHAT_RABBITMQ_PASSWORD}
+      BOT_INBOX_EXCHANGE: ${CHAT_BOT_INBOX_EXCHANGE:-chat.bot-inbox.exchange}
+      BOT_INBOX_ROUTING_KEY: ${CHAT_BOT_INBOX_ROUTING_KEY:-chat.bot-inbox}
+      BOT_INBOX_QUEUE: ${AI_BOT_INBOX_QUEUE:-ai-service.bot-inbox.commands}
+      AI_REPLY_EXCHANGE: ${CHAT_AI_REPLY_EXCHANGE:-chat.ai-reply.exchange}
+      AI_REPLY_ROUTING_KEY: ${CHAT_AI_REPLY_ROUTING_KEY:-chat.ai-reply}
+      AI_REPLY_MAX_CHARS: ${AI_REPLY_MAX_CHARS:-16000}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+      GOOGLE_MODEL: ${GOOGLE_MODEL:-gemini-2.5-flash}
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
 volumes:
   postgres_data:
   pgadmin_data:

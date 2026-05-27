@@ -5,7 +5,11 @@ import java.util.List;
 import java.util.UUID;
 
 public interface OutboxService {
-    void enqueuePrivateMessage(UUID senderId, UUID recipientId, String content);
+    OutboxMessage enqueuePrivateMessage(
+        UUID senderId,
+        UUID recipientId,
+        String content
+    );
 
     OutboxMessage requireMessage(UUID messageId);
 

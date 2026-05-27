@@ -7,7 +7,10 @@ import com.connectchat.chat.client.GroupClient;
 import com.connectchat.chat.client.IdentityUserClient;
 import com.connectchat.chat.client.MessageStorageClient;
 import com.connectchat.chat.client.response.IdentityUserResponse;
+import com.connectchat.chat.common.messaging.BotMessageCommand;
 import com.connectchat.chat.common.messaging.PrivateMessageStatus;
+import com.connectchat.chat.common.messaging.RabbitBotMessagePublisher;
+import com.connectchat.chat.config.ChatAiProperties;
 import com.connectchat.chat.entity.GroupOutboxMessage;
 import com.connectchat.chat.entity.OutboxMessage;
 import com.connectchat.chat.service.ChatApplicationService;
@@ -30,6 +33,8 @@ public class ChatApplicationServiceImpl implements ChatApplicationService {
     private final IdentityUserClient identityUserClient;
     private final GroupClient groupClient;
     private final MessageStorageClient messageStorageClient;
+    private final ChatAiProperties chatAiProperties;
+    private final RabbitBotMessagePublisher rabbitBotMessagePublisher;
 
     @Override
     public void handlePrivateMessage(
@@ -39,11 +44,23 @@ public class ChatApplicationServiceImpl implements ChatApplicationService {
         IdentityUserResponse recipient = identityUserClient.getUserByPhoneNumber(
             request.recipientPhoneNumber()
         );
-        outboxService.enqueuePrivateMessage(
+        OutboxMessage message = outboxService.enqueuePrivateMessage(
             senderId,
             recipient.userId(),
             request.content()
         );
+
+        if (recipient.userId().equals(chatAiProperties.botUserId())) {
+            rabbitBotMessagePublisher.publish(
+                new BotMessageCommand(
+                    message.getId(),
+                    senderId,
+                    recipient.userId(),
+                    request.content(),
+                    message.toEvent().occurredAt()
+                )
+            );
+        }
     }
 
     @Override

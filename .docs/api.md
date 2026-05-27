@@ -704,7 +704,7 @@ Validation:
 | Field | Required | Rule |
 | --- | --- | --- |
 | `recipientPhoneNumber` | yes | E.164 format |
-| `content` | yes | not blank, max 4000 chars |
+| `content` | yes | not blank, max 16000 chars |
 
 Notes:
 
@@ -850,7 +850,7 @@ Validation:
 | Field | Required | Rule |
 | --- | --- | --- |
 | `groupId` | yes | UUID |
-| `content` | yes | not blank, max 4000 chars |
+| `content` | yes | not blank, max 16000 chars |
 
 ### Acknowledge Group Delivered
 

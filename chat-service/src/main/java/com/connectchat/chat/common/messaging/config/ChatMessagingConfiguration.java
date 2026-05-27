@@ -1,5 +1,6 @@
 package com.connectchat.chat.common.messaging.config;
 
+import com.connectchat.chat.config.ChatAiProperties;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
@@ -15,7 +16,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableConfigurationProperties(ChatMessagingProperties.class)
+@EnableConfigurationProperties({
+    ChatMessagingProperties.class,
+    ChatAiProperties.class
+})
 public class ChatMessagingConfiguration {
 
     @Bean
@@ -59,6 +63,21 @@ public class ChatMessagingConfiguration {
     }
 
     @Bean
+    DirectExchange botInboxExchange(ChatAiProperties properties) {
+        return exchange(properties.botInboxExchange());
+    }
+
+    @Bean
+    DirectExchange aiReplyExchange(ChatAiProperties properties) {
+        return exchange(properties.aiReplyExchange());
+    }
+
+    @Bean
+    Queue aiReplyCommandQueue(ChatAiProperties properties) {
+        return queue(properties.aiReplyCommandQueue());
+    }
+
+    @Bean
     @ConditionalOnProperty(
         prefix = "chat.messaging",
         name = "private-message-listener-enabled",
@@ -99,6 +118,19 @@ public class ChatMessagingConfiguration {
             statusConfirmedQueue,
             statusConfirmedExchange,
             properties.statusConfirmedRoutingKey()
+        );
+    }
+
+    @Bean
+    Binding aiReplyCommandBinding(
+        Queue aiReplyCommandQueue,
+        DirectExchange aiReplyExchange,
+        ChatAiProperties properties
+    ) {
+        return binding(
+            aiReplyCommandQueue,
+            aiReplyExchange,
+            properties.aiReplyRoutingKey()
         );
     }
 

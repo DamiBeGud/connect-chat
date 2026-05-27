@@ -9,6 +9,9 @@ data:
   POSTGRES_MULTIPLE_DATABASES: identity_service,group_service,chat_service,message_storage_service
 
   RABBITMQ_DEFAULT_USER: guest
+  RABBITMQ_HOST: rabbitmq
+  RABBITMQ_PORT: "5672"
+  RABBITMQ_USERNAME: guest
 
   CASSANDRA_CLUSTER_NAME: connect-chat
   CASSANDRA_DC: datacenter1
@@ -53,6 +56,11 @@ data:
   CHAT_PRIVATE_MESSAGE_LISTENER_ENABLED: "false"
   CHAT_GROUP_MESSAGE_EXCHANGE: chat.group-message.exchange
   CHAT_GROUP_MESSAGE_ROUTING_KEY: chat.group-message
+  CHAT_BOT_INBOX_EXCHANGE: chat.bot-inbox.exchange
+  CHAT_BOT_INBOX_ROUTING_KEY: chat.bot-inbox
+  CHAT_AI_REPLY_COMMAND_QUEUE: chat.ai-reply.commands
+  CHAT_AI_REPLY_EXCHANGE: chat.ai-reply.exchange
+  CHAT_AI_REPLY_ROUTING_KEY: chat.ai-reply
   CHAT_WEBSOCKET_DELIVERY_BATCH_SIZE: "50"
   CHAT_WEBSOCKET_DELIVERY_PROCESSING_DELAY: "500"
   CHAT_WEBSOCKET_DELIVERY_TASK_TTL: "5m"
@@ -81,3 +89,13 @@ data:
   PRESENCE_REDIS_PORT: "6379"
   PRESENCE_REDIS_PASSWORD: ""
   PRESENCE_SESSION_TTL: "30m"
+
+  AI_BOT_USER_ID: 00000000-0000-0000-0000-000000000001
+  AI_BOT_PHONE_NUMBER: "+10000000000"
+  BOT_INBOX_EXCHANGE: chat.bot-inbox.exchange
+  BOT_INBOX_ROUTING_KEY: chat.bot-inbox
+  BOT_INBOX_QUEUE: ai-service.bot-inbox.commands
+  AI_REPLY_EXCHANGE: chat.ai-reply.exchange
+  AI_REPLY_ROUTING_KEY: chat.ai-reply
+  AI_REPLY_MAX_CHARS: "16000"
+  GOOGLE_MODEL: gemini-2.5-flash

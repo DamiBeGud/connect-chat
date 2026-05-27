@@ -18,12 +18,12 @@ public class OutboxServiceImpl implements OutboxService {
 
     @Override
     @Transactional
-    public void enqueuePrivateMessage(
+    public OutboxMessage enqueuePrivateMessage(
         UUID senderId,
         UUID recipientId,
         String content
     ) {
-        outboxMessageRepository.save(
+        return outboxMessageRepository.save(
             OutboxMessage.builder()
                 .senderId(senderId)
                 .recipientId(recipientId)

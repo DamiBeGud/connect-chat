@@ -24,21 +24,62 @@ docker build -f group-service/.docker/Dockerfile -t connect-chat/group-service:l
 docker build -f chat-service/.docker/Dockerfile -t connect-chat/chat-service:local chat-service
 docker build -f message-storage-service/.docker/Dockerfile -t connect-chat/message-storage-service:local message-storage-service
 docker build -f presence-service/.docker/Dockerfile -t connect-chat/presence-service:local presence-service
+docker build -f ai-service/Dockerfile -t connect-chat/ai-service:local ai-service
 
 k3d image import connect-chat/identity-service:local -c connect-chat
 k3d image import connect-chat/group-service:local -c connect-chat
 k3d image import connect-chat/chat-service:local -c connect-chat
 k3d image import connect-chat/message-storage-service:local -c connect-chat
 k3d image import connect-chat/presence-service:local -c connect-chat
+k3d image import connect-chat/ai-service:local -c connect-chat
 ```
 
 ## 3. Apply manifests
 
-Create the namespace first, then apply everything else:
+Create the namespace first:
 
 ```bash
 kubectl apply -f k8s/local/00-namespace.yaml
+```
+
+For secrets, either apply the local placeholder Secret and then override it from your ignored `.env` file:
+
+```bash
+kubectl apply -f k8s/local/02-secret-local.yaml
+kubectl -n connect-chat create secret generic connect-chat-secret \
+  --from-env-file=.env \
+  --dry-run=client \
+  -o yaml | kubectl apply -f -
+```
+
+Or keep local k3s secrets in ignored `k8s/local/02-secret-local.override.yaml`. This is the recommended path for `GOOGLE_API_KEY`, which is intentionally not stored in the tracked placeholder Secret. Copy `k8s/local/02-secret-local.yaml` to that path, change local-only values, and apply it after the placeholder Secret:
+
+```bash
+kubectl apply -f k8s/local/02-secret-local.yaml
+kubectl apply -f k8s/local/02-secret-local.override.yaml
+```
+
+At minimum, set `GOOGLE_API_KEY` before using the AI bot. If you use the `.env` option, keep the existing local database/Rabbit/JWT keys there too so the generated `connect-chat-secret` remains complete.
+
+Then apply the non-secret manifests:
+
+```bash
+kubectl apply -f k8s/local/01-config.yaml
+kubectl apply -f k8s/local/10-postgres.yaml
+kubectl apply -f k8s/local/11-rabbitmq.yaml
+kubectl apply -f k8s/local/12-redis.yaml
+kubectl apply -f k8s/local/13-cassandra.yaml
+kubectl apply -f k8s/local/20-app-services.yaml
+```
+
+For quick local resets, applying the full directory is fine when you use `02-secret-local.override.yaml`, because the ignored override file lives in the same directory. If you use the `.env` command instead, run the Secret command again after applying the full directory so the placeholder Secret does not leave `GOOGLE_API_KEY` empty:
+
+```bash
 kubectl apply -f k8s/local
+kubectl -n connect-chat create secret generic connect-chat-secret \
+  --from-env-file=.env \
+  --dry-run=client \
+  -o yaml | kubectl apply -f -
 ```
 
 Wait for infrastructure and apps:
@@ -55,6 +96,7 @@ kubectl -n connect-chat rollout status deploy/presence-service --timeout=180s
 kubectl -n connect-chat rollout status deploy/group-service --timeout=180s
 kubectl -n connect-chat rollout status deploy/chat-service --timeout=180s
 kubectl -n connect-chat rollout status deploy/message-storage-service --timeout=180s
+kubectl -n connect-chat rollout status deploy/ai-service --timeout=180s
 ```
 
 ## 4. Access services locally
@@ -72,6 +114,7 @@ Run port-forward commands in separate terminals for the remaining services:
 ```bash
 kubectl -n connect-chat port-forward svc/message-storage-service 8084:8084
 kubectl -n connect-chat port-forward svc/presence-service 8085:8085
+kubectl -n connect-chat port-forward svc/ai-service 8000:8000
 ```
 
 Do not use `kubectl port-forward svc/chat-service 8083:8083` when testing load distribution. Port-forwarding a service can pin traffic to a single backend pod instead of exercising normal Kubernetes service balancing.
@@ -93,6 +136,7 @@ kubectl -n connect-chat get pods
 kubectl -n connect-chat get svc
 kubectl -n connect-chat logs deploy/chat-service -f
 kubectl -n connect-chat logs deploy/message-storage-service -f
+kubectl -n connect-chat logs deploy/ai-service -f
 ```
 
 Check that three chat pods are running:
