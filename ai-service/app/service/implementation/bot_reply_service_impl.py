@@ -1,6 +1,7 @@
 import logging
 
 from app.common.messaging.events import AiPrivateReplyCommand, BotMessageCommand
+from app.common.text.llm_message_formatter import clean_llm_message
 from app.config.settings import Settings
 from app.service.ai_client import AiClient
 
@@ -28,6 +29,7 @@ class BotReplyServiceImpl:
         else:
             answer = self.ai_client.generate(command.content)
 
+        answer = clean_llm_message(answer)
         answer = self._cap_reply(answer)
 
         return AiPrivateReplyCommand(
