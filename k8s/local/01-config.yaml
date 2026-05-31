@@ -98,7 +98,7 @@ data:
   AI_REPLY_EXCHANGE: chat.ai-reply.exchange
   AI_REPLY_ROUTING_KEY: chat.ai-reply
   AI_REPLY_MAX_CHARS: "16000"
-  GOOGLE_MODEL: gemini-2.5-flash
+  GOOGLE_MODEL: gemini-3-flash
   RIDE_AND_PARK_MCP_URL: http://ride-and-park-mcp-server:8080
   AI_TOOL_TIMEOUT_SECONDS: "10"
   AI_PARKING_RESULT_LIMIT: "5"

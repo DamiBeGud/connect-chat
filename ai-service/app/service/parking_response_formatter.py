@@ -17,7 +17,7 @@ def extract_destination(message: str) -> str:
         if index >= 0:
             destination = normalized[index + len(marker) :].strip(" .?!")
             if destination:
-                return destination
+                return _clean_destination(destination)
 
     cleaned = normalized
     for phrase in (
@@ -34,7 +34,19 @@ def extract_destination(message: str) -> str:
     ):
         cleaned = cleaned.replace(phrase, " ")
         cleaned = cleaned.replace(phrase.title(), " ")
-    return " ".join(cleaned.strip(" .?!").split())
+    return _clean_destination(cleaned)
+
+
+def _clean_destination(destination: str) -> str:
+    cleaned = " ".join(destination.strip(" .?!").split())
+    lower = cleaned.lower()
+    for prefix in ("to the ", "to ", "the "):
+        if lower.startswith(prefix):
+            cleaned = cleaned[len(prefix) :].strip()
+            lower = cleaned.lower()
+
+    words = ["Hauptbahnhof" if word.lower() == "hbf" else word for word in cleaned.split()]
+    return " ".join(words)
 
 
 class ParkingResponseFormatter:
@@ -82,9 +94,10 @@ class ParkingResponseFormatter:
         if distance is not None:
             lines.append(f"   Distance: {distance} km")
 
-        directions_url = self._directions_url(parking)
-        if directions_url:
-            lines.append(f"   Directions: {directions_url}")
+        directions_urls = self._directions_urls(parking)
+        if directions_urls:
+            lines.append(f"   Google Maps: {directions_urls['google']}")
+            lines.append(f"   Apple Maps: {directions_urls['apple']}")
 
         opening_hours = parking.get("openingHours")
         if opening_hours:
@@ -131,12 +144,15 @@ class ParkingResponseFormatter:
             return value
         return parsed.strftime("%Y-%m-%d %H:%M")
 
-    def _directions_url(self, parking: dict[str, Any]) -> str | None:
+    def _directions_urls(self, parking: dict[str, Any]) -> dict[str, str] | None:
         lat = self._number_or_none(parking.get("lat"))
         lng = self._number_or_none(parking.get("lng"))
         if lat is None or lng is None:
             return None
-        return f"https://www.google.com/maps/dir/?api=1&destination={lat},{lng}"
+        return {
+            "google": f"https://www.google.com/maps/dir/?api=1&destination={lat},{lng}",
+            "apple": f"https://maps.apple.com/?daddr={lat},{lng}",
+        }
 
     def _number_or_none(self, value: Any) -> float | None:
         try:

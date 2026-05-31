@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     ai_reply_max_chars: int = 16_000
 
     google_api_key: str = ""
-    google_model: str = "gemini-2.5-flash"
+    google_model: str = "gemini-3-flash-preview"
 
     ride_and_park_mcp_url: str = "http://ride-and-park-mcp-server:8080"
     ai_tool_timeout_seconds: float = 10

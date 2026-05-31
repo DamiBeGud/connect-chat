@@ -5,6 +5,7 @@ from app.common.messaging.events import BotMessageCommand
 from app.config.settings import Settings
 from app.service.implementation.bot_reply_service_impl import BotReplyServiceImpl
 from app.service.implementation.google_ai_client import GoogleAiClient
+from app.service.parking_response_formatter import extract_destination
 
 BOT_USER_ID = UUID("00000000-0000-0000-0000-000000000001")
 
@@ -113,7 +114,8 @@ def test_parking_prompt_triggers_ride_and_park_tool_path():
     assert "Parkhaus Hauptbahnhof" in reply
     assert "Free spaces: 184 of 420" in reply
     assert "Status: open" in reply
-    assert "https://www.google.com/maps/dir/?api=1&destination=48.7842663,9.1821173" in reply
+    assert "Google Maps: https://www.google.com/maps/dir/?api=1&destination=48.7842663,9.1821173" in reply
+    assert "Apple Maps: https://maps.apple.com/?daddr=48.7842663,9.1821173" in reply
 
 
 def test_parking_reply_omits_directions_when_coordinates_are_missing():
@@ -137,7 +139,19 @@ def test_parking_reply_omits_directions_when_coordinates_are_missing():
     reply = client.generate("parking near Stuttgart")
 
     assert "No Coordinates Garage" in reply
-    assert "Directions:" not in reply
+    assert "Google Maps:" not in reply
+    assert "Apple Maps:" not in reply
+
+
+def test_extract_destination_cleans_near_to_the_prefix_and_hbf_abbreviation():
+    assert (
+        extract_destination("Can you find parking spaces near to the Frankfurt hauptbahnhof?")
+        == "Frankfurt hauptbahnhof"
+    )
+    assert (
+        extract_destination("Can you find parking spaces near to the Frankfurt am Main HBF?")
+        == "Frankfurt am Main Hauptbahnhof"
+    )
 
 
 def test_empty_parking_list_becomes_clear_no_results_reply():
