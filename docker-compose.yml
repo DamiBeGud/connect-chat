@@ -98,6 +98,18 @@ services:
       timeout: 5s
       retries: 10
 
+  ride-and-park-mcp-server:
+    build: ./ride-and-park-mcp-server
+    container_name: connect-chat-ride-and-park-mcp-server
+    restart: unless-stopped
+    environment:
+      RIDE_AND_PARK_API_BASE_URL: ${RIDE_AND_PARK_API_BASE_URL:-http://host.docker.internal:3000/api}
+      RIDE_AND_PARK_REQUEST_TIMEOUT_SECONDS: ${RIDE_AND_PARK_REQUEST_TIMEOUT_SECONDS:-10}
+      DEFAULT_PARKING_RADIUS_KM: ${DEFAULT_PARKING_RADIUS_KM:-5}
+      DEFAULT_PARKING_LIMIT: ${DEFAULT_PARKING_LIMIT:-5}
+    ports:
+      - "${RIDE_AND_PARK_MCP_HOST_PORT:-8080}:8080"
+
   ai-service:
     build: ./ai-service
     container_name: connect-chat-ai-service
@@ -115,10 +127,16 @@ services:
       AI_REPLY_ROUTING_KEY: ${CHAT_AI_REPLY_ROUTING_KEY:-chat.ai-reply}
       AI_REPLY_MAX_CHARS: ${AI_REPLY_MAX_CHARS:-16000}
       GOOGLE_API_KEY: ${GOOGLE_API_KEY}
-      GOOGLE_MODEL: ${GOOGLE_MODEL:-gemini-2.5-flash}
+      GOOGLE_MODEL: ${GOOGLE_MODEL:-gemini-3-flash-preview}
+      RIDE_AND_PARK_MCP_URL: http://ride-and-park-mcp-server:8080
+      AI_TOOL_TIMEOUT_SECONDS: ${AI_TOOL_TIMEOUT_SECONDS:-10}
+      AI_PARKING_RESULT_LIMIT: ${AI_PARKING_RESULT_LIMIT:-5}
+      AI_ENABLE_RIDE_AND_PARK_TOOLS: ${AI_ENABLE_RIDE_AND_PARK_TOOLS:-true}
     depends_on:
       rabbitmq:
         condition: service_healthy
+      ride-and-park-mcp-server:
+        condition: service_started
 
 volumes:
   postgres_data:

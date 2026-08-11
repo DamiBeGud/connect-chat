@@ -25,6 +25,8 @@ docker build -f chat-service/.docker/Dockerfile -t connect-chat/chat-service:loc
 docker build -f message-storage-service/.docker/Dockerfile -t connect-chat/message-storage-service:local message-storage-service
 docker build -f presence-service/.docker/Dockerfile -t connect-chat/presence-service:local presence-service
 docker build -f ai-service/Dockerfile -t connect-chat/ai-service:local ai-service
+docker build -f ride-and-park-backend/Dockerfile -t connect-chat/ride-and-park-backend:local ride-and-park-backend
+docker build -f ride-and-park-mcp-server/Dockerfile -t connect-chat/ride-and-park-mcp-server:local ride-and-park-mcp-server
 
 k3d image import connect-chat/identity-service:local -c connect-chat
 k3d image import connect-chat/group-service:local -c connect-chat
@@ -32,6 +34,8 @@ k3d image import connect-chat/chat-service:local -c connect-chat
 k3d image import connect-chat/message-storage-service:local -c connect-chat
 k3d image import connect-chat/presence-service:local -c connect-chat
 k3d image import connect-chat/ai-service:local -c connect-chat
+k3d image import connect-chat/ride-and-park-backend:local -c connect-chat
+k3d image import connect-chat/ride-and-park-mcp-server:local -c connect-chat
 ```
 
 ## 3. Apply manifests
@@ -96,6 +100,8 @@ kubectl -n connect-chat rollout status deploy/presence-service --timeout=180s
 kubectl -n connect-chat rollout status deploy/group-service --timeout=180s
 kubectl -n connect-chat rollout status deploy/chat-service --timeout=180s
 kubectl -n connect-chat rollout status deploy/message-storage-service --timeout=180s
+kubectl -n connect-chat rollout status deploy/ride-and-park-backend --timeout=180s
+kubectl -n connect-chat rollout status deploy/ride-and-park-mcp-server --timeout=180s
 kubectl -n connect-chat rollout status deploy/ai-service --timeout=180s
 ```
 
@@ -115,6 +121,8 @@ Run port-forward commands in separate terminals for the remaining services:
 kubectl -n connect-chat port-forward svc/message-storage-service 8084:8084
 kubectl -n connect-chat port-forward svc/presence-service 8085:8085
 kubectl -n connect-chat port-forward svc/ai-service 8000:8000
+kubectl -n connect-chat port-forward svc/ride-and-park-backend 3000:3000
+kubectl -n connect-chat port-forward svc/ride-and-park-mcp-server 8080:8080
 ```
 
 Do not use `kubectl port-forward svc/chat-service 8083:8083` when testing load distribution. Port-forwarding a service can pin traffic to a single backend pod instead of exercising normal Kubernetes service balancing.
